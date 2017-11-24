@@ -31,6 +31,13 @@ do_update() {
 	sed -i "s/ECO_VERSION=.*/ECO_VERSION=$ECO_VERSION/g" $CONFIG
 	sed -i "s/check=.*/check=$check/g" $CONFIG
 	sed -i "s/startonboot=.*/startonboot=$startonboot/g" $CONFIG
-if [ -z $SERVER_TYPE ]; then
-	whiptail --fb --msgbox "This is a templete for the first update" 20 60 0
+
+if [ -f /opt/ELSM/Files/conf.cfg ]; then
+	do_changelog
+	do_update
+else
+	whiptail --msgbox --fb "Sorry it seems that your ELSM installation is not complete. Leaving." 20 60 0
+	clear
+	echo "No conf.cfg found in /opt/ELSM/Files/" ; exit 1
 fi
+exit 0
