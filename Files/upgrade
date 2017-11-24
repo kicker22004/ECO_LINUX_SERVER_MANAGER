@@ -17,9 +17,9 @@ rm changelog
 
 do_update() {
 	cp $CONFIG $INSTALL_LOC/Files/conf.cfg.bak
-	wget https://raw.githubusercontent.com/kicker22004/BSCC-MC-Edition/master/BSCC -O BSCC
-	wget https://raw.githubusercontent.com/kicker22004/BSCC-MC-Edition/master/Files/conf.cfg -O conf.cfg
-	wget https://raw.githubusercontent.com/kicker22004/BSCC-MC-Edition/master/Files/update.sh -O update.sh
+	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/ELSM -O ELSM
+	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/conf.cfg -O conf.cfg
+	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/update.sh -O update.sh
 	clear
 	sudo mv ELSM /usr/bin/
 	sudo chmod +x /usr/bin/ELSM
