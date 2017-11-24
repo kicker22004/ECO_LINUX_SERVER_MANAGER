@@ -31,6 +31,7 @@ do_update() {
 	sed -i "s/ECO_VERSION=.*/ECO_VERSION=$ECO_VERSION/g" $CONFIG
 	sed -i "s/check=.*/check=$check/g" $CONFIG
 	sed -i "s/startonboot=.*/startonboot=$startonboot/g" $CONFIG
+}
 
 if [ -f /opt/ELSM/Files/conf.cfg ]; then
 	do_changelog
