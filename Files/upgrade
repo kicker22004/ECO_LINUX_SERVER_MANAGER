@@ -9,9 +9,9 @@ cd $INSTALL_LOC/Files
 
 do_changelog() {
         cat <<EOF >> changelog
-1. This is a templete for later...
+1. First Public Beta.
 EOF
-whiptail --fb --title "ELSM Changelog templete" --textbox changelog 20 60
+whiptail --fb --title "ELSM Changelog 0.0.2" --textbox changelog 20 60
 rm changelog
 }
 
