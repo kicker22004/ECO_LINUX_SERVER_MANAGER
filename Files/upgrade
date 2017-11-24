@@ -1,0 +1,36 @@
+#!/bin/bash
+INSTALL_LOC=/opt/ELSM
+CONFIG=$INSTALL_LOC/Files/conf.cfg
+###############################
+###      Version 0.0.1      ###
+###############################
+
+cd $INSTALL_LOC/Files
+
+do_changelog() {
+        cat <<EOF >> changelog
+1. This is a templete for later...
+EOF
+whiptail --fb --title "ELSM Changelog templete" --textbox changelog 20 60
+rm changelog
+}
+
+do_update() {
+	cp $CONFIG $INSTALL_LOC/Files/conf.cfg.bak
+	wget https://raw.githubusercontent.com/kicker22004/BSCC-MC-Edition/master/BSCC -O BSCC
+	wget https://raw.githubusercontent.com/kicker22004/BSCC-MC-Edition/master/Files/conf.cfg -O conf.cfg
+	wget https://raw.githubusercontent.com/kicker22004/BSCC-MC-Edition/master/Files/update.sh -O update.sh
+	clear
+	sudo mv ELSM /usr/bin/
+	sudo chmod +x /usr/bin/ELSM
+	chmod +x /opt/BSCC/Files/update.sh
+
+##Grab old info and copy it to the new conf.cfg##
+#################################################
+	source $INSTALL_LOC/Files/conf.cfg.bak
+	sed -i "s/ECO_VERSION=.*/ECO_VERSION=$ECO_VERSION/g" $CONFIG
+	sed -i "s/check=.*/check=$check/g" $CONFIG
+	sed -i "s/startonboot=.*/startonboot=$startonboot/g" $CONFIG
+if [ -z $SERVER_TYPE ]; then
+	whiptail --fb --msgbox "This is a templete for the first update" 20 60 0
+fi
