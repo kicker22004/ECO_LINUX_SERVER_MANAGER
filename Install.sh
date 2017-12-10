@@ -28,7 +28,7 @@ apt-get install screen git wget rsync unzip sysstat inotify-tools bc
 if [ ! -f /usr/bin/himalaya ]; then
 	sudo apt-get -y update
 	sudo apt-get -y upgrade
-	sudo apt-get -y install npm node
+	sudo apt-get -y install npm
 	curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 	sudo apt-get -y install nodejs
 	sudo npm install --global himalaya
