@@ -31,6 +31,7 @@ do_update() {
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/ServerVersion.txt -O ServerVersion.txt
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/watch.sh -O watch.sh
 	clear
+	echo "Root is needed to install ELSM in (/usr/bin/)"
 	sudo mv ELSM /usr/bin/
 	sudo chmod +x /usr/bin/ELSM
 	chmod +x /opt/ELSM/Files/update.sh
