@@ -33,9 +33,9 @@ do_update() {
 	clear
 	sudo mv ELSM /usr/bin/
 	sudo chmod +x /usr/bin/ELSM
-	chmod +x /opt/BSCC/Files/update.sh
-	chmod +x /opt/BSCC/Files/upgrade
-	chmod +x /opt/BSCC/Files/watch.sh
+	chmod +x /opt/ELSM/Files/update.sh
+	chmod +x /opt/ELSM/Files/upgrade
+	chmod +x /opt/ELSM/Files/watch.sh
 
 ##Grab old info and copy it to the new conf.cfg##
 #################################################
