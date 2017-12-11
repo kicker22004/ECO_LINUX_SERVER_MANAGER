@@ -24,16 +24,6 @@ fi
 do_deps() {
 apt-get -y update
 apt-get install screen git wget rsync unzip sysstat inotify-tools bc
-#More may go here as things are descovered
-if [ ! -f /usr/bin/himalaya ]; then
-	sudo apt-get -y update
-	sudo apt-get -y upgrade
-	sudo apt-get -y install npm
-	curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-	sudo apt-get -y install nodejs
-	sudo npm install --global himalaya
-fi
-}
 
 ##Currently hardcoded for 16.04 Ubuntu... This may change
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
@@ -74,6 +64,7 @@ do_x86
 fi
 fi
 fi
+}
 
 do_warning() {
 if (whiptail --fb --title "Erase Everything??" --yesno "If you choose to do a clean install it will erase your ECO Server If you've made one already using this script.. Are you 100% sure? \
@@ -108,9 +99,11 @@ If you agree Please, continue." 15 60) then
         mkdir $INSTALL_LOC
 	mkdir $INSTALL_LOC/Backup
 	mkdir $INSTALL_LOC/Files
+	mkdir $INSTALL_LOC/Files/ELSM_LOGS
         mkdir $INSTALL_LOC/Server
 	mkdir $INSTALL_LOC/Server/Storage
 	mkdir $INSTALL_LOC/Server/Storage/Backup
+	touch $INSTALL_LOC/Files/ELSM_LOGS/ELSM.log
 	cp Files/* $INSTALL_LOC/Files
         echo XXX
         sleep 5
@@ -130,6 +123,7 @@ If you agree Please, continue." 15 60) then
         echo "Setting Permissions"
         chown -R $SUDO_USER:$SUDO_USER $INSTALL_LOC
 	chmod +x /usr/bin/ELSM
+	chmod +x $INSTALL_LOC/Files/watch.sh
 	chmod +x $INSTALL_LOC/Files/update.sh
 	chmod +x $INSTALL_LOC/Files/update.sh
 	chmod +x $INSTALL_LOC/Files/upgrade
