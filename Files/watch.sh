@@ -3,7 +3,11 @@ source /opt/ELSM/Files/conf.cfg
 NOW=$(date "+%FT%T")
 
 ###Save last log###
+if [ -f $LOG_FILE ]; then
 mv $LOG_FILE $LOG_DIR/ELSM_$NOW.log
+else
+touch $LOG_FILE
+fi
 
 ##Keep top 10 logs and remove the rest##
 ls -dt $LOG_DIR/* | tail -n +11 | xargs rm -rf
