@@ -18,6 +18,10 @@ do_no_menu_start() {
   else
      echo "Server was found running... close it before running this"
   fi
+  if ! screen -list | grep -q "WATCH"; then
+     cd $INSTALL_LOC/Files/
+     $WATCH
+  fi
 }
 
 do_no_menu_stop() {
@@ -25,51 +29,174 @@ do_no_menu_stop() {
     sed -i 's/check=.*/check=false/g' $CONFIG
     cd $DIR
     $STOP
+    screen -X -S WATCH quit
   else
      echo "No server was found to be running...did you start on?"
   fi
 }
 
-do_Qboot() {
-crontabs="/var/spool/cron/crontabs"
+
+## Removed for now because it's untested...
+#do_Qboot() {
+#crontabs="/var/spool/cron/crontabs"
 ##Setup on boot requests.
-if (whiptail --fb --title "Start Server on bootup?" --yes-button "Yes" --no-button "No"  --yesno "Would You like the server to startup on boot?" 10 60) then
-    sed -i 's/startonboot=.*/startonboot=true/g' $CONFIG
-    sudo sed -i".bak" '/ELSM boot/d' $crontabs/$USER; (crontab -l 2>/dev/null; echo "@reboot ELSM boot") | crontab -
+#if (whiptail --fb --title "Start Server on bootup?" --yes-button "Yes" --no-button "No"  --yesno "Would You like the server to startup on boot?" 10 60) then
+#    sed -i 's/startonboot=.*/startonboot=true/g' $CONFIG
+#    sudo sed -i".bak" '/ELSM boot/d' $crontabs/$USER; (crontab -l 2>/dev/null; echo "@reboot ELSM boot") | crontab -
+#else
+#    sed -i 's/startonboot=.*/startonboot=false/g' $CONFIG
+#    sudo sed -i".bak" '/ELSM boot/d' /var/spool/cron/crontabs/$USER
+#fi
+#}
+
+#do_onboot() {
+#    if [[ $startonboot = "true" ]]
+#then
+#  echo "Starting server"
+#  cd $DIR
+#  $START
+#  if ! screen -list | grep -q "WATCH"; then
+#     cd $INSTALL_LOC/Files/
+#     $WATCH
+#  fi
+#else
+#  echo "Set Onboot was not selected"
+#fi
+#exit 0
+#}
+
+#do_reload() {
+#if ! screen -list | grep -q "ECO"; then
+#    cd $DIR
+#    $START
+#    sed -i 's/check=.*/check=true/g' $CONFIG
+#    if ! screen -list | grep -q "WATCH"; then
+#    cd $INSTALL_LOC/Files/
+#    $WATCH
+#  fi
+#fi
+#exit 0
+#}
+
+#do_check() {
+#  if [[ $check = "true" ]]
+#then
+#  do_reload
+#fi
+#exit 0
+#}
+
+CONFIGS="/opt/ELSM/Server/Configs"
+
+do_write() {
+#This stops jq from erasing a config file if the variable is empty.
+if [ $CONFIG_OUTPUT ]; then
+echo "config is not empty"
+jq '.'${SUB_OPTION}' = '${CONFIG_OUTPUT}'' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+}
+
+do_config_menu() {
+echo $OPTION
+RET=$?
+if [ $RET -eq 0 ]; then
+if [[ ! $OPTION = ""true"" && ! $OPTION = ""false"" ]]; then
+CONFIG_OUTPUT=$(whiptail --fb --inputbox "$SEL Selected!" 10 80 $OPTION --title "$SEL Menu" 3>&1 1>&2 2>&3)
+do_write
 else
-    sed -i 's/startonboot=.*/startonboot=false/g' $CONFIG
-    sudo sed -i".bak" '/ELSM boot/d' /var/spool/cron/crontabs/$USER
+CONFIG_OUTPUT=$(whiptail --fb --yesno "$SEL: This only allows True or False, Currently set to: ($OPTION)" --yes-button "TRUE" --no-button "FALSE" 10 80 $OPTION --title "$SEL Menu" 3>&1 1>&2 2>&3)
 fi
-}
-
-do_onboot() {
-    if [[ $startonboot = "true" ]]
-then
-  echo "Starting server"
-  cd $DIR
-  $START
 else
-  echo "Set Onboot was not selected"
+exit 1
 fi
-exit 0
 }
 
-do_reload() {
-if ! screen -list | grep -q "ECO"; then
-    cd $DIR
-    $START
-    sed -i 's/check=.*/check=true/g' $CONFIG
-fi
-exit 0
+do_list_sel() {
+SEL=$(whiptail --fb --menu "$NETWORKING Configs" 20 60 10  ${SEL[@]} 3>&1 1>&2 2>&3)
 }
 
-do_check() {
-  if [[ $check = "true" ]]
-then
-  do_reload
+
+### List options that we want in simple edit.
+do_start_config() {
+##Get the lists!
+unset FALLBACK NETWORKING SEL OPTION FILE
+FALLBACK="do_start_config"
+LIST=$(ls $DIR/Configs/ | awk -F. '{print $1" |"}')
+SEL=$(whiptail --menu --fb "Configs Menu" 20 60 10 ${LIST[@]} 3>&1 1>&2 2>&3)
+RET=$?
+if [ $RET -eq 0 ]; then
+do_main_config
 fi
-exit 0
 }
+
+do_main_config() {
+##Add this break until more files are editable
+CONFIG_LIST=$(cat $INSTALL_LOC/Files/Config_mods.txt | grep "$SEL" | cut -d "=" -f2)
+#WorldGenerator was recommended to have set sizes"
+if [ $SEL = "WorldGenerator" ]; then
+WG_SIZE=$(whiptail --title "World Size" --radiolist "Choose: (Spacebar to select!)" 20 60 10\
+  "Little_Big_Planet" "[20x20 World]" off \
+  "1X (Default)" "[100x100 World]" on \
+  "2X" "[140x140 World]" off \
+  "4X" "[200x200 World]" off \
+  3>&1 1>&2 2>&3)
+if [ "$WG_SIZE" = "Little_Big_Planet" ]; then
+jq '.Dimensions.x = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.Dimensions.y = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
+fi
+if [ "$WG_SIZE" = "1X (Default)" ]; then
+jq '.Dimensions.x = "100"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.Dimensions.y = "100"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
+fi
+if [ "$WG_SIZE" = "2X" ]; then
+jq '.Dimensions.x = "140"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.Dimensions.y = "140"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
+fi
+if [ "$WG_SIZE" = "4X" ]; then
+jq '.Dimensions.x = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.Dimensions.y = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
+fi
+fi
+if [ ! $CONFIG_LIST ]; then
+whiptail --msgbox --fb "This file currently is only supported for Advanced editing!" 10 60 0
+nano $CONFIGS/$SEL.eco
+$FALLBACK
+else
+echo "Entering sub_config"
+do_sub_config
+fi
+}
+
+do_sub_config() {
+if (whiptail --fb --yesno "You have the option to edit this file one of two ways!" --yes-button "Simple" --no-button "Advanced" 10 80) then
+do_simple
+else
+nano $CONFIGS/$SEL.eco
+$FALLBACK
+fi
+}
+
+do_simple() {
+unset SUB_OPTION OPTION
+CONFIG_LIST=$(cat $INSTALL_LOC/Files/Config_mods.txt | grep "$SEL" | cut -d "=" -f2)
+SUB_OPTION=$(whiptail --fb --menu "$SEL Configs" 20 60 10  ${CONFIG_LIST[@]} 3>&1 1>&2 2>&3)
+RET=$?
+echo $CONFIG_LIST
+echo $SUB_OPTION
+if [ $RET -eq 0 ]; then
+OPTION=$(jq .$SUB_OPTION $CONFIGS/$SEL.eco)
+do_config_menu
+do_simple
+else
+$FALLBACK
+fi
+}
+
+
 
 do_first_run() {
 (
@@ -109,6 +236,10 @@ do_first_run() {
                break
               fi
               done
+	if ! screen -list | grep -q "WATCH"; then
+		cd $INSTALL_LOC/Files/
+		$WATCH
+	fi
 	echo 60
         echo XXX
         echo 80
@@ -143,6 +274,10 @@ else
     whiptail --fb --msgbox "Found a server running please stop it first!" 20 60 1
     do_Qstop
 fi
+if ! screen -list | grep -q "WATCH"; then
+     cd $INSTALL_LOC/Files/
+     $WATCH
+fi
 }
 
 
@@ -161,6 +296,7 @@ do_Qstop() {
   if [ $RET -eq 0 ]; then
     sed -i 's/check=.*/check=false/g' $CONFIG
     $STOP
+    screen -X -S WATCH quit
     whiptail --fb --msgbox "Stopping Server.." 20 60 1
   fi
 }
@@ -169,6 +305,12 @@ do_Qstop() {
 
 do_install() {
 ###Grab a list and see what we can do with it##
+##KILLING FOR NOW
+clear
+echo "This program is being stopped from installing anything until more testing has been done."
+exit 1
+
+
 cd $INSTALL_LOC
 wget https://s3-us-west-2.amazonaws.com/eco-releases -O eco.html
 himalaya eco.html eco.json
@@ -209,6 +351,7 @@ while true; do
   FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
     "1 Start" "[Attempts to start the server]" \
     "2 Stop" "[Attempt to stop the server]" \
+    "3 Configs" "[Allows you to make changes to config files]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -217,6 +360,7 @@ RET=$?
     case "$FUN" in
       1\ *) do_start ;;
       2\ *) do_stop ;;
+      3\ *) do_start_config ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
