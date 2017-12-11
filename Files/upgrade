@@ -2,28 +2,40 @@
 INSTALL_LOC=/opt/ELSM
 CONFIG=$INSTALL_LOC/Files/conf.cfg
 ###############################
-###      Version 0.0.1      ###
+###      Version 0.0.3      ###
 ###############################
 
 cd $INSTALL_LOC/Files
 
 do_changelog() {
         cat <<EOF >> changelog
-1. First Public Beta.
+1. Overhaul to ELSM main script.
+2. Removed a lot of the auto restart from Main script and moved to secondary script.
+3. Added Configs for logging crash reports.
+4. Added ServerVersion lists. (Hoping to remove this soon)
+5. Added Config menu with easy to use interface, Much can be added here but will leave it to the user/admin.
+6. Watch script to attempt recover from crash. (up to 3 times...20 minutes)
 EOF
-whiptail --fb --title "ELSM Changelog 0.0.2" --textbox changelog 20 60
+whiptail --fb --title "ELSM Changelog 0.0.3" --textbox changelog 20 60
 rm changelog
 }
 
 do_update() {
+	##New Folder for 0.0.3
+	mkdir ELSM_LOGS
 	cp $CONFIG $INSTALL_LOC/Files/conf.cfg.bak
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/ELSM -O ELSM
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/conf.cfg -O conf.cfg
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/update.sh -O update.sh
+	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/Config_mod.txt -O Config_mod.txt
+	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/ServerVersion.txt -O ServerVersion.txt
+	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/watch.sh -O watch.sh
 	clear
 	sudo mv ELSM /usr/bin/
 	sudo chmod +x /usr/bin/ELSM
 	chmod +x /opt/BSCC/Files/update.sh
+	chmod +x /opt/BSCC/Files/upgrade
+	chmod +x /opt/BSCC/Files/watch.sh
 
 ##Grab old info and copy it to the new conf.cfg##
 #################################################
