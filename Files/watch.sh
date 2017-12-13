@@ -25,6 +25,7 @@ echo "The server is down!, Attempting to restart.
 Failure counter is at: $COUNTER out of 3
 
 " >> $LOG_FILE
+    cd $DIR
     $START
     let COUNTER=COUNTER+1
     sleep 5m
@@ -33,7 +34,7 @@ Failure counter is at: $COUNTER out of 3
 #Watch for the screen to be live every 30 seconds
 COUNTER=0
 while true; do
-sleep 30s
+sleep 10s
    if screen -list | grep -q "ECO"; then
     COUNTER=0
 else
