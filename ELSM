@@ -161,7 +161,6 @@ if [ "$WG_SIZE" = "Little_Big_Planet" ]; then
 jq '.Dimensions.x = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
-exit 1
 fi
 if [ "$WG_SIZE" = "1X (Default)" ]; then
 jq '.Dimensions.x = "100"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
