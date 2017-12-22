@@ -275,7 +275,7 @@ do_first_run() {
         sleep 2
 ) | whiptail --gauge "Gathering info" 8 40 0
 ##Leave the script so we don't confuse users and attempt to start it after it's all ready up.
-INTERNAL_IP=$(ifconfig $NETIF | grep 'inet addr:'| cut -d: -f2 | awk '{ print $1}')
+INTERNAL_IP=$(hostname -I | awk '{print $1}')
 whiptail --msgbox --fb "Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:3001" 20 60 0
 clear
 echo -e ${green}"Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:3001"
@@ -402,7 +402,7 @@ cpufree=$(mpstat 1 1 | tail -n 1 | awk '{printf $12}')
 CPU=$(echo "scale=1; x=100-$cpufree; if(x<1) print 0; x" | bc)
 #Gather Internal and External IP
 EXTERNAL_IP=$(/usr/bin/curl -s http://mdrjr.net/ip.php)
-INTERNAL_IP=$(ifconfig $NETIF | grep 'inet addr:'| cut -d: -f2 | awk '{ print $1}')
+INTERNAL_IP=$(hostname -I | awk '{print $1}')
 ELSM_PID=$(lsof -Pi :$PORT -sTCP:LISTEN -t)
 UPTIME=$(ps -o etime= -p $ELSM_PID)
 LOAD=$(uptime | grep -o "load average.*")
