@@ -18,6 +18,7 @@ source /opt/ELSM/Files/conf.cfg
         unset BSCC_VERSION
         source /opt/ELSM/Files/conf.cfg
         echo "Currently Installed Version: $ELSM_VERSION"
+	echo -e ${green}"Created and Maintained by: Kicker22004"
         $CLEAR
 if [ $find = $ELSM_VERSION ]; then
         echo -e ${green}"You are up to date."
