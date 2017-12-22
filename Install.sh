@@ -1,13 +1,5 @@
 #!/bin/bash
 
-##Temp stop for anything not Ubuntu...Debain is being worked on now.
-DISTRO=$(lsb_release --id | awk '{print $3}')
-if [ ! "$DISTRO" = "Ubuntu" ]; then
-clear
-echo "Sorry but currently only Ubuntu is supported by ELSM.."
-exit 1
-fi
-
 ## Eco Linux Server Manager Installer##
 INSTALL_LOC=/opt/ELSM
 CPUINFO=`lscpu | grep "Architecture" | awk '{print $2}'`
