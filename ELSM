@@ -6,6 +6,7 @@ yellow='\e[1;33m'
 
 source /opt/ELSM/Files/conf.cfg
 
+
 do_update() {
 $INSTALL_LOC/Files/update.sh
 }
@@ -19,7 +20,7 @@ do_no_menu_start() {
   fi
   if ! screen -list | grep -q "WATCH"; then
      cd $INSTALL_LOC/Files/
-     $WATCH
+     $WATCH_START
   fi
 }
 
@@ -27,7 +28,7 @@ do_no_menu_stop() {
   if screen -list | grep -q "ECO"; then
     cd $DIR
     $STOP
-    screen -X -S WATCH quit
+    $WATCH_STOP
   else
      echo "No server was found to be running...did you start on?"
   fi
@@ -84,6 +85,27 @@ do_no_menu_stop() {
 #exit 0
 #}
 
+##Time to include a restart command..
+do_restart() {
+if(whiptail --fb --title "Restart Eco Server?" --yes-button "Yes" --no-button "No"  --yesno "Would You like to restart Eco?" 10 60) then
+	while true; do
+		if screen -list | grep -q "ECO"; then
+			$WATCH_STOP
+			$STOP
+			sleep 5
+		else
+			cd $DIR
+			$START
+			cd $INSTALL_LOC/Files/
+			$WATCH_START
+			break
+		fi
+done
+else
+echo "NOPE"
+fi
+}
+
 CONFIGS="/opt/ELSM/Server/Configs"
 
 do_write() {
@@ -127,12 +149,9 @@ do_main_config
 fi
 }
 
-do_main_config() {
-##Add this break until more files are editable
-CONFIG_LIST=$(cat $INSTALL_LOC/Files/Config_mods.txt | grep "$SEL" | cut -d "=" -f2)
-#WorldGenerator was recommended to have set sizes"
-if [ $SEL = "WorldGenerator" ]; then
-WG_SIZE=$(whiptail --title "World Size" --radiolist "Choose: (Spacebar to select!)" 20 60 10\
+do_world_size() {
+SEL="WorldGenerator"
+WG_SIZE=$(whiptail --fb --title "World Size" --radiolist "Choose: (Spacebar to select!)" 20 60 10\
   "Little_Big_Planet" "[20x20 World]" off \
   "1X (Default)" "[100x100 World]" on \
   "2X" "[140x140 World]" off \
@@ -142,6 +161,7 @@ if [ "$WG_SIZE" = "Little_Big_Planet" ]; then
 jq '.Dimensions.x = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
+exit 1
 fi
 if [ "$WG_SIZE" = "1X (Default)" ]; then
 jq '.Dimensions.x = "100"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
@@ -158,7 +178,11 @@ jq '.Dimensions.x = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
 fi
-fi
+}
+
+do_main_config() {
+##Add this break until more files are editable
+CONFIG_LIST=$(cat $INSTALL_LOC/Files/Config_mods.txt | grep "$SEL" | cut -d "=" -f2)
 if [ ! $CONFIG_LIST ]; then
 whiptail --msgbox --fb "This file currently is only supported for Advanced editing!" 10 60 0
 nano $CONFIGS/$SEL.eco
@@ -201,6 +225,7 @@ do_first_run() {
         sleep 1
         echo XXX
         echo 20
+#	do_start_config
         echo "Inputing user selection"
         echo XXX
         sleep 1
@@ -220,8 +245,8 @@ do_first_run() {
         #If server doesn't go down, Force it.
 	 for ((i=3600;i>0;i=i-1)); do
                 clear
-                port=$(lsof -Pi :3000 -sTCP:LISTEN -t)
-                if [ -z $port ]; then
+                ELSM_PID=$(lsof -Pi :$PORT -sTCP:LISTEN -t)
+                if [ -z $ELSM_PID ]; then
 #                echo -e ${yellow}"The ECO server is loading up for the first time!, Depending on your machine this could take A LONG TIME.. Please wait..."
                 echo -n "Time Remaining $i seconds, Before Failure.."
                	if ! screen -list | grep -q "ECO"; then
@@ -236,7 +261,7 @@ do_first_run() {
               done
 	if ! screen -list | grep -q "WATCH"; then
 		cd $INSTALL_LOC/Files/
-		$WATCH
+		$WATCH_START
 	fi
 	echo 60
         echo XXX
@@ -273,7 +298,7 @@ else
 fi
 if ! screen -list | grep -q "WATCH"; then
      cd $INSTALL_LOC/Files/
-     $WATCH
+     $WATCH_START
 fi
 }
 
@@ -292,7 +317,7 @@ do_Qstop() {
   RET=$?
   if [ $RET -eq 0 ]; then
     $STOP
-    screen -X -S WATCH quit
+    $WATCH_STOP
     whiptail --fb --msgbox "Stopping Server.." 20 60 1
   fi
 }
@@ -301,16 +326,10 @@ do_Qstop() {
 
 do_install() {
 ###Grab a list and see what we can do with it##
-##KILLING FOR NOW
-clear
-echo "This program is being stopped from installing anything until more testing has been done."
-exit 1
-
+##Currently using a set list to allow users to add versions until a more reliable method can be made to automate this again.
 
 cd $INSTALL_LOC
-wget https://s3-us-west-2.amazonaws.com/eco-releases -O eco.html
-himalaya eco.html eco.json
-eco_server_list=$(cat eco.json | grep -o "EcoServer.*-alpha.zip" | sort -Vr | cut -d "-" -f1 | awk '{print $1 " |"}')
+eco_server_list=$(cat $INSTALL_LOC/Files/ServerVersions.txt | awk '{print $1 " |"}')
 
 SELECTED_VERSION=$(whiptail --menu --fb "Select Your ECO server." 20 60 10 ${eco_server_list[@]} 3>&1 1>&2 2>&3)
 RET=$?
@@ -328,9 +347,11 @@ fi
 
 cd $DIR
 #Grab avalible download versions from site (Linux Server only)
-#wget https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION-alpha.zip
 unzip $SELECTED_VERSION-alpha.zip
 rm $SELECTED_VERSION-alpha.zip
+sed -i 's/ECO_VERSION=.*/ECO_VERSION='$SELECTED_VERSION'/g' $INSTALL_LOC/Files/conf.cfg
+do_world_size
+do_start_config
 do_first_run
 }
 
@@ -347,7 +368,9 @@ while true; do
   FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
     "1 Start" "[Attempts to start the server]" \
     "2 Stop" "[Attempt to stop the server]" \
-    "3 Configs" "[Allows you to make changes to config files]" \
+    "3 Restart" "[Restart the server]" \
+    "4 Configs" "[Allows you to make changes to config files]" \
+    "5 Info" "[Fast information about the server.]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -356,7 +379,9 @@ RET=$?
     case "$FUN" in
       1\ *) do_start ;;
       2\ *) do_stop ;;
-      3\ *) do_start_config ;;
+      3\ *) do_restart ;;
+      4\ *) do_start_config ;;
+      5\ *) do_info ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
@@ -364,6 +389,51 @@ RET=$?
   fi
 done
 }
+
+
+do_info(){
+if screen -list | grep -q "ECO"; then
+STATUS="ONLINE"
+else
+STATUS="OFFLINE"
+fi
+on_now=$(ss -t | grep -o "$PORT" | wc -l)
+#Calculate accurate CPU usage.
+cpufree=$(mpstat 1 1 | tail -n 1 | awk '{printf $12}')
+CPU=$(echo "scale=1; x=100-$cpufree; if(x<1) print 0; x" | bc)
+#Gather Internal and External IP
+EXTERNAL_IP=$(/usr/bin/curl -s http://mdrjr.net/ip.php)
+INTERNAL_IP=$(ifconfig $NETIF | grep 'inet addr:'| cut -d: -f2 | awk '{ print $1}')
+ELSM_PID=$(lsof -Pi :$PORT -sTCP:LISTEN -t)
+UPTIME=$(ps -o etime= -p $ELSM_PID)
+LOAD=$(uptime | grep -o "load average.*")
+RAM=$(free -mh | grep Mem | awk '{print $4}')
+RAM_TOTAL=$(free -mh | grep "Mem" | awk '{print $2}')
+TOTAL=$(du -sh $DIR | awk '{print $1}')
+HDD_TOTAL=$(df -kh . | grep / | awk '{print $4}')
+MONO_VERSION=$(mono -V | grep version.* | cut -d " " -f 5)
+whiptail --fb --clear --title "Current server stats" --yesno --yes-button REFRESH --no-button Back \
+"Server Status: $STATUS \n
+ELSM Version: $ELSM_VERSION \n
+Start on Boot: $startonboot \n
+Server Version: $ECO_VERSION \n
+Current Players Online: $on_now \n
+CPU Usage is: $CPU% \n
+Server Uptime: $UPTIME \n
+$LOAD \n
+Ram Available: "$RAM\B"(Free/Total)"$RAM_TOTAL\B" \n
+Server size on disk: $TOTAL(Used/Free)$HDD_TOTAL \n
+Your Mono Version is: $MONO_VERSION \n
+IP: $INTERNAL_IP | Remote IP: $EXTERNAL_IP" 35 55 10
+CHOICES=$?
+unset TOTAL on_list CPU LOAD UPTIME RAM STATUS
+  if [ $CHOICES -eq 0 ]; then
+   	do_info
+fi
+clear
+}
+
+
 
 case "$1" in
   (help)
@@ -376,6 +446,14 @@ case "$1" in
     ;;
   (stop)
     do_no_menu_stop
+    exit 0
+    ;;
+ (info)
+   do_info
+    exit 0
+    ;;
+ (restart)
+   do_restart
     exit 0
     ;;
    (*)
