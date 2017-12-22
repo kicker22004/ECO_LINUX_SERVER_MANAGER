@@ -30,14 +30,17 @@ fi
 #######  Check for Dependencies  #######
 ########################################
 do_deps() {
+##Detect OS
+DISTRO=$(lsb_release --id | awk '{print $3}')
+CODENAME=$(lsb_release --codename | awk '{print $2}')
 apt-get -y update
-apt-get install screen git wget rsync unzip sysstat inotify-tools bc jq
+apt-get install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils
 
-##Currently hardcoded for 16.04 Ubuntu... This may change
+##Currently hardcoded for Mono Beta (5.8) on Ubuntu and Debian.
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-echo "deb http://download.mono-project.com/repo/ubuntu beta-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
-sudo apt-get -y update
-sudo apt-get -y install mono-devel
+echo "deb http://download.mono-project.com/repo/${DISTRO} beta-$(CODENAME} main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
+apt-get -y update
+apt-get -y install mono-devel
 }
 
 do_arm() {
