@@ -38,7 +38,7 @@ apt-get install screen git wget rsync unzip sysstat inotify-tools bc jq curl mor
 
 ##Currently hardcoded for Mono Beta (5.8) on Ubuntu and Debian.
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-echo "deb http://download.mono-project.com/repo/${DISTRO} beta-$(CODENAME} main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
+echo "deb http://download.mono-project.com/repo/${DISTRO} beta-${CODENAME} main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
 apt-get -y update
 apt-get -y install mono-devel
 }
