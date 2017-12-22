@@ -1,5 +1,13 @@
 #!/bin/bash
 
+##Temp stop for anything not Ubuntu...Debain is being worked on now.
+DISTRO=$(lsb_release --id | awk '{print $3}')
+if [ ! "$DISTRO" = "Ubuntu" ]; then
+clear
+echo "Sorry but currently only Ubuntu is supported by ELSM.."
+exit 1
+fi
+
 ## Eco Linux Server Manager Installer##
 INSTALL_LOC=/opt/ELSM
 CPUINFO=`lscpu | grep "Architecture" | awk '{print $2}'`
@@ -23,14 +31,14 @@ fi
 ########################################
 do_deps() {
 apt-get -y update
-apt-get install screen git wget rsync unzip sysstat inotify-tools bc
+apt-get install screen git wget rsync unzip sysstat inotify-tools bc jq
 
 ##Currently hardcoded for 16.04 Ubuntu... This may change
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
 echo "deb http://download.mono-project.com/repo/ubuntu beta-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
 sudo apt-get -y update
 sudo apt-get -y install mono-devel
-
+}
 
 do_arm() {
 if [[ "$CPUINFO" == arm* ]]; then
@@ -64,7 +72,6 @@ do_x86
 fi
 fi
 fi
-}
 
 do_warning() {
 if (whiptail --fb --title "Erase Everything??" --yesno "If you choose to do a clean install it will erase your ECO Server If you've made one already using this script.. Are you 100% sure? \
