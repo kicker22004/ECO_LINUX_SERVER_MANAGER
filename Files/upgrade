@@ -2,7 +2,7 @@
 INSTALL_LOC=/opt/ELSM
 CONFIG=$INSTALL_LOC/Files/conf.cfg
 ###############################
-###      Version 0.0.6     ###
+###      Version 0.0.7     ###
 ###############################
 
 cd $INSTALL_LOC/Files
