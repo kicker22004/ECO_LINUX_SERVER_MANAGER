@@ -335,10 +335,10 @@ RET=$?
 if [ $RET -eq 1 ]; then  
 exit 1
 elif [ $RET -eq 0 ]; then
-dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION-alpha.zip")
+dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION-beta.zip")
 fi
 
-r=$(wget $dl_link -O $DIR/$SELECTED_VERSION-alpha.zip)
+r=$(wget $dl_link -O $DIR/$SELECTED_VERSION-beta.zip)
 if [ $? -ne 0 ]; then
 whiptail --msgbox --clear --fb "Download failed!, check your internet and the link.\
 The current link is: $dl_link" 20 60
@@ -346,8 +346,8 @@ fi
 
 cd $DIR
 #Grab avalible download versions from site (Linux Server only)
-unzip $SELECTED_VERSION-alpha.zip
-rm $SELECTED_VERSION-alpha.zip
+unzip $SELECTED_VERSION-beta.zip
+rm $SELECTED_VERSION-beta.zip
 sed -i 's/ECO_VERSION=.*/ECO_VERSION='$SELECTED_VERSION'/g' $INSTALL_LOC/Files/conf.cfg
 do_world_size
 do_start_config
