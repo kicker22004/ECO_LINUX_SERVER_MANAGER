@@ -94,6 +94,7 @@ if(whiptail --fb --title "Restart Eco Server?" --yes-button "Yes" --no-button "N
 			$STOP
 			sleep 5
 		else
+			$WATCH_STOP
 			cd $DIR
 			$START
 			cd $INSTALL_LOC/Files/
