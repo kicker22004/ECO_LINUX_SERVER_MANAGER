@@ -135,14 +135,13 @@ do_list_sel() {
 SEL=$(whiptail --fb --menu "$NETWORKING Configs" 20 60 10  ${SEL[@]} 3>&1 1>&2 2>&3)
 }
 
-
 ### List options that we want in simple edit.
 do_start_config() {
 ##Get the lists!
 unset FALLBACK NETWORKING SEL OPTION FILE
 FALLBACK="do_start_config"
 LIST=$(ls $DIR/Configs/ | awk -F. '{print $1" |"}')
-SEL=$(whiptail --menu --fb "Configs Menu" 20 60 10 ${LIST[@]} 3>&1 1>&2 2>&3)
+SEL=$(whiptail --menu --fb "Configs Menu" --ok-button Enter --cancel-button Back 20 60 10 ${LIST[@]} 3>&1 1>&2 2>&3)
 RET=$?
 if [ $RET -eq 0 ]; then
 do_main_config
@@ -180,44 +179,9 @@ fi
 }
 
 do_main_config() {
-##Add this break until more files are editable
-CONFIG_LIST=$(cat $INSTALL_LOC/Files/Config_mods.txt | grep "$SEL" | cut -d "=" -f2)
-if [ ! $CONFIG_LIST ]; then
-whiptail --msgbox --fb "This file currently is only supported for Advanced editing!" 10 60 0
 nano $CONFIGS/$SEL.eco
 $FALLBACK
-else
-echo "Entering sub_config"
-do_sub_config
-fi
 }
-
-do_sub_config() {
-if (whiptail --fb --yesno "You have the option to edit this file one of two ways!" --yes-button "Simple" --no-button "Advanced" 10 80) then
-do_simple
-else
-nano $CONFIGS/$SEL.eco
-$FALLBACK
-fi
-}
-
-do_simple() {
-unset SUB_OPTION OPTION
-CONFIG_LIST=$(cat $INSTALL_LOC/Files/Config_mods.txt | grep "$SEL" | cut -d "=" -f2)
-SUB_OPTION=$(whiptail --fb --menu "$SEL Configs" 20 60 10  ${CONFIG_LIST[@]} 3>&1 1>&2 2>&3)
-RET=$?
-echo $CONFIG_LIST
-echo $SUB_OPTION
-if [ $RET -eq 0 ]; then
-OPTION=$(jq .$SUB_OPTION $CONFIGS/$SEL.eco)
-do_config_menu
-do_simple
-else
-$FALLBACK
-fi
-}
-
-
 
 do_first_run() {
 (
