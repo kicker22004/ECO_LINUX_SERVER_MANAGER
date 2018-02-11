@@ -358,6 +358,7 @@ do_first_run
 do_menu() {
 ##Simple check to make sure there is actually a server built##
 ##############################################################
+wget -q https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/ServerVersions.txt -O $INSTALL_LOC/Files/ServerVersions.txt
 if [ ! -f $DIR/EcoServer.exe ]; then
 do_install
 fi
