@@ -325,20 +325,20 @@ do_Qstop() {
 
 do_install() {
 ###Grab a list and see what we can do with it##
-##Currently using a set list to allow users to add versions until a more reliable method can be made to automate this again.
-
+cd $INSTALL_LOC/Files
+GETLIST=$(wget -q https://s3-us-west-2.amazonaws.com/eco-releases -O list.xml)
+eco_server_list=$(cat list.xml | grep -o "EcoServer_........-beta.zip" | sort -r | awk '{print $1 " |"}')
 cd $INSTALL_LOC
-eco_server_list=$(cat $INSTALL_LOC/Files/ServerVersions.txt | awk '{print $1 " |"}')
 
 SELECTED_VERSION=$(whiptail --menu --fb "Select Your ECO server." 20 60 10 ${eco_server_list[@]} 3>&1 1>&2 2>&3)
 RET=$?
 if [ $RET -eq 1 ]; then  
 exit 1
 elif [ $RET -eq 0 ]; then
-dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION-beta.zip")
+dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION")
 fi
 
-r=$(wget $dl_link -O $DIR/$SELECTED_VERSION-beta.zip)
+r=$(wget $dl_link -O $DIR/$SELECTED_VERSION)
 if [ $? -ne 0 ]; then
 whiptail --msgbox --clear --fb "Download failed!, check your internet and the link.\
 The current link is: $dl_link" 20 60
@@ -346,8 +346,8 @@ fi
 
 cd $DIR
 #Grab avalible download versions from site (Linux Server only)
-unzip $SELECTED_VERSION-beta.zip
-rm $SELECTED_VERSION-beta.zip
+unzip $SELECTED_VERSION
+rm $SELECTED_VERSION
 sed -i 's/ECO_VERSION=.*/ECO_VERSION='$SELECTED_VERSION'/g' $INSTALL_LOC/Files/conf.cfg
 do_world_size
 do_start_config
@@ -358,7 +358,6 @@ do_first_run
 do_menu() {
 ##Simple check to make sure there is actually a server built##
 ##############################################################
-wget -q https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/ServerVersions.txt -O $INSTALL_LOC/Files/ServerVersions.txt
 if [ ! -f $DIR/EcoServer.exe ]; then
 do_install
 fi
