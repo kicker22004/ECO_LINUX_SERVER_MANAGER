@@ -34,103 +34,22 @@ do_no_menu_stop() {
   fi
 }
 
-
-## Removed for now because it's untested...
-#do_Qboot() {
-#crontabs="/var/spool/cron/crontabs"
-##Setup on boot requests.
-#if (whiptail --fb --title "Start Server on bootup?" --yes-button "Yes" --no-button "No"  --yesno "Would You like the server to startup on boot?" 10 60) then
-#    sed -i 's/startonboot=.*/startonboot=true/g' $CONFIG
-#    sudo sed -i".bak" '/ELSM boot/d' $crontabs/$USER; (crontab -l 2>/dev/null; echo "@reboot ELSM boot") | crontab -
-#else
-#    sed -i 's/startonboot=.*/startonboot=false/g' $CONFIG
-#    sudo sed -i".bak" '/ELSM boot/d' /var/spool/cron/crontabs/$USER
-#fi
-#}
-
-#do_onboot() {
-#    if [[ $startonboot = "true" ]]
-#then
-#  echo "Starting server"
-#  cd $DIR
-#  $START
-#  if ! screen -list | grep -q "WATCH"; then
-#     cd $INSTALL_LOC/Files/
-#     $WATCH
-#  fi
-#else
-#  echo "Set Onboot was not selected"
-#fi
-#exit 0
-#}
-
-#do_reload() {
-#if ! screen -list | grep -q "ECO"; then
-#    cd $DIR
-#    $START
-#    sed -i 's/check=.*/check=true/g' $CONFIG
-#    if ! screen -list | grep -q "WATCH"; then
-#    cd $INSTALL_LOC/Files/
-#    $WATCH
-#  fi
-#fi
-#exit 0
-#}
-
-#do_check() {
-#  if [[ $check = "true" ]]
-#then
-#  do_reload
-#fi
-#exit 0
-#}
-
 ##Time to include a restart command..
 do_restart() {
 if(whiptail --fb --title "Restart Eco Server?" --yes-button "Yes" --no-button "No"  --yesno "Would You like to restart Eco?" 10 60) then
 	while true; do
 		if screen -list | grep -q "ECO"; then
-			$WATCH_STOP
 			$STOP
-			sleep 5
-		else
-			$WATCH_STOP
-			cd $DIR
-			$START
-			cd $INSTALL_LOC/Files/
-			$WATCH_START
 			break
+		else
+			echo "No server was found, Starting now..."
+			do_no_menu_start
 		fi
 done
-else
-echo "NOPE"
 fi
 }
 
 CONFIGS="/opt/ELSM/Server/Configs"
-
-do_write() {
-#This stops jq from erasing a config file if the variable is empty.
-if [ $CONFIG_OUTPUT ]; then
-echo "config is not empty"
-jq '.'${SUB_OPTION}' = '${CONFIG_OUTPUT}'' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-fi
-}
-
-do_config_menu() {
-echo $OPTION
-RET=$?
-if [ $RET -eq 0 ]; then
-if [[ ! $OPTION = ""true"" && ! $OPTION = ""false"" ]]; then
-CONFIG_OUTPUT=$(whiptail --fb --inputbox "$SEL Selected!" 10 80 $OPTION --title "$SEL Menu" 3>&1 1>&2 2>&3)
-do_write
-else
-CONFIG_OUTPUT=$(whiptail --fb --yesno "$SEL: This only allows True or False, Currently set to: ($OPTION)" --yes-button "TRUE" --no-button "FALSE" 10 80 $OPTION --title "$SEL Menu" 3>&1 1>&2 2>&3)
-fi
-else
-exit 1
-fi
-}
 
 do_list_sel() {
 SEL=$(whiptail --fb --menu "$NETWORKING Configs" 20 60 10  ${SEL[@]} 3>&1 1>&2 2>&3)
@@ -139,7 +58,7 @@ SEL=$(whiptail --fb --menu "$NETWORKING Configs" 20 60 10  ${SEL[@]} 3>&1 1>&2 2
 ### List options that we want in simple edit.
 do_start_config() {
 ##Get the lists!
-unset FALLBACK NETWORKING SEL OPTION FILE
+unset FALLBACK SEL LIST
 FALLBACK="do_start_config"
 LIST=$(ls $DIR/Configs/ | awk -F. '{print $1" |"}')
 SEL=$(whiptail --menu --fb "Configs Menu" --ok-button Enter --cancel-button Back 20 60 10 ${LIST[@]} 3>&1 1>&2 2>&3)
@@ -160,22 +79,18 @@ WG_SIZE=$(whiptail --fb --title "World Size" --radiolist "Choose: (Spacebar to s
 if [ "$WG_SIZE" = "Little_Big_Planet" ]; then
 jq '.Dimensions.x = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
 fi
 if [ "$WG_SIZE" = "1X (Default)" ]; then
 jq '.Dimensions.x = "100"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "100"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
 fi
 if [ "$WG_SIZE" = "2X" ]; then
 jq '.Dimensions.x = "140"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "140"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
 fi
 if [ "$WG_SIZE" = "4X" ]; then
 jq '.Dimensions.x = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-whiptail --msgbox --fb "Looking for more selectable options, if none are found you will enter Advanced editing" 20 60 0
 fi
 }
 
@@ -280,8 +195,8 @@ do_Qstop() {
     --yes-button Yes --no-button No
   RET=$?
   if [ $RET -eq 0 ]; then
-    $STOP
     $WATCH_STOP
+    $STOP
     whiptail --fb --msgbox "Stopping Server.." 20 60 1
   fi
 }
@@ -297,7 +212,7 @@ cd $INSTALL_LOC
 
 SELECTED_VERSION=$(whiptail --menu --fb "Select Your ECO server." 20 60 10 ${eco_server_list[@]} 3>&1 1>&2 2>&3)
 RET=$?
-if [ $RET -eq 1 ]; then  
+if [ $RET -eq 1 ]; then
 exit 1
 elif [ $RET -eq 0 ]; then
 dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION")
@@ -319,6 +234,122 @@ do_start_config
 do_first_run
 }
 
+do_upgrade() {
+if screen -list | grep -q "ECO"; then
+    cd $DIR
+    $WATCH_STOP
+    $STOP
+fi
+
+cd $INSTALL_LOC/Files
+GETLIST=$(wget -q https://s3-us-west-2.amazonaws.com/eco-releases -O list.xml)
+eco_server_list=$(cat list.xml | grep -o "EcoServer_........-beta.zip" | sort -r > list)
+UPGRADE_VERSIONS=$(cat list | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
+UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' list | sort -r | awk '{print $1 " |"}')
+
+if [ $UPGRADE_VERSIONS = "1" ]; then
+        whiptail --fb --msgbox --title "Latest Version found!" "You're currently running the latest ECO Beta, Check back later" 10 70 0
+do_menu
+else
+rm -rf $INSTALL_LOC/Backup/*
+rm $INSTALL_LOC/Archives/UPGRADE_ROLLBACK.tar.gz
+cd $INSTALL_LOC/Archives
+cp $INSTALL_LOC/Files/conf.cfg $DIR/
+tar -zcvf UPGRADE_ROLLBACK.tar.gz -C $DIR .
+tar -xf UPGRADE_ROLLBACK.tar.gz -C $INSTALL_LOC/Backup/
+rm -rf $DIR/*
+cd $INSTALL_LOC
+SELECTED_VERSION=$(whiptail --menu --fb "Select Your ECO server." 20 60 10 ${UPGRADE_LIST[@]} 3>&1 1>&2 2>&3)
+RET=$?
+if [ $RET -eq 1 ]; then
+#Falling back
+cd $INSTALL_LOC/Archives/
+tar -xf UPGRADE_ROLLBACK.tar.gz -C $DIR
+mv $DIR/conf.cfg /$INSTALL_LOC/Files/
+whiptail --fb --msgbox --title "Emergency Recovery" "Your server was restored because you canceled" 10 60 0
+do_menu
+elif [ $RET -eq 0 ]; then
+dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION")
+fi
+
+r=$(wget $dl_link -O $DIR/$SELECTED_VERSION)
+if [ $? -ne 0 ]; then
+whiptail --msgbox --clear --fb "Download failed!, check your internet and the link.\
+The current link is: $dl_link" 20 60
+fi
+fi
+cd $DIR
+#Grab avalible download versions from site (Linux Server only)
+unzip $SELECTED_VERSION
+rm $SELECTED_VERSION
+if [ ! -d $DIR/Storage ]; then
+        mkdir $DIR/Storage
+fi
+sed -i 's/ECO_VERSION=.*/ECO_VERSION='$SELECTED_VERSION'/g' $INSTALL_LOC/Files/conf.cfg
+cp -R $INSTALL_LOC/Backup/Storage/* $DIR/Storage/
+
+## Grabing saved configs.
+VAR=( $(ls $DIR/Configs/) )
+x=0
+while [ $x -le "${#VAR[@]}" ]
+do
+SELECTED="${VAR[$x]}"
+x=$(( $x + 1 ))
+if [ $x = "${#VAR[@]}" ]; then
+break
+else
+jq -s 'add' $DIR/Configs/$SELECTED $INSTALL_LOC/Backup/Configs/$SELECTED | sponge $DIR/Configs/$SELECTED
+fi
+done
+whiptail --fb --msgbox --title "Completed" "Your server is now running version: $SELECTED_VERSION" 10 60 0
+source /opt/ELSM/Files/conf.cfg
+do_menu
+}
+
+do_restore() {
+rm -rf $DIR/*
+cd $INSTALL_LOC/Archives/
+tar -xf UPGRADE_ROLLBACK.tar.gz -C $DIR
+mv $DIR/conf.cfg /$INSTALL_LOC/Files/
+whiptail --fb --msgbox --title "Emergency Recovery" "Your server was restored to your last backup!" 10 60 0
+source /opt/ELSM/Files/conf.cfg
+do_menu
+}
+
+do_upgrade_menu() {
+while true; do
+  FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
+    "1 Upgrade" "[Upgrade ECO]" \
+    "2 Restore" "[Fallback to the last upgrade attempt.]" \
+  3>&1 1>&2 2>&3)
+RET=$?
+  if [ $RET -eq 1 ]; then
+    do_menu
+  elif [ $RET -eq 0 ]; then
+    case "$FUN" in
+      1\ *) do_upgrade ;;
+      2\ *) do_restore ;;
+ *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+    esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+  else
+    exit 1
+  fi
+done
+}
+
+do_ECO_upgrade_check() {
+cd $INSTALL_LOC/Files
+GETLIST=$(wget -q https://s3-us-west-2.amazonaws.com/eco-releases -O list.xml)
+eco_server_list=$(cat list.xml | grep -o "EcoServer_........-beta.zip" | sort -r > list)
+UPGRADE_VERSIONS=$(cat list | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
+UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' list | sort -r | awk '{print $1 " |"}')
+
+if [ ! $UPGRADE_VERSIONS = "1" ]; then
+	if (whiptail --fb --title "ECO Upgrade Notice!" --yesno "There were ECO upgrades found!, Would you like to update now?" 10 78) then
+    		do_upgrade
+	fi
+fi
+}
 
 do_menu() {
 ##Simple check to make sure there is actually a server built##
@@ -327,6 +358,9 @@ if [ ! -f $DIR/EcoServer.exe ]; then
 do_install
 fi
 do_update
+##We will now ask about ECO upgrades.
+do_ECO_upgrade_check
+
 source /opt/ELSM/Files/conf.cfg
 while true; do
   FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
@@ -334,7 +368,8 @@ while true; do
     "2 Stop" "[Attempt to stop the server]" \
     "3 Restart" "[Restart the server]" \
     "4 Configs" "[Allows you to make changes to config files]" \
-    "5 Info" "[Fast information about the server.]" \
+    "5 Upgrade/Fallback" "[Upgrade ECO or fallback after failed upgrade.]" \
+    "6 Info" "[Fast information about the server.]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -345,7 +380,8 @@ RET=$?
       2\ *) do_stop ;;
       3\ *) do_restart ;;
       4\ *) do_start_config ;;
-      5\ *) do_info ;;
+      5\ *) do_upgrade_menu ;;
+      6\ *) do_info ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
