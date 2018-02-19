@@ -18,6 +18,9 @@ echo "==============================================================
 
 " > $LOG_FILE
 
+##Attempt to start ECO Before 10 second loop.
+$START
+sleep 2
 do_restart() {
 ###Make a new logfile for the start.###
 echo $(date) >> $LOG_FILE
@@ -28,7 +31,7 @@ Failure counter is at: $COUNTER out of 3
     cd $DIR
     $START
     let COUNTER=COUNTER+1
-    sleep 5m
+    sleep 1m
 }
 
 #Watch for the screen to be live every 30 seconds
