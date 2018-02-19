@@ -301,6 +301,7 @@ jq -s 'add' $DIR/Configs/$SELECTED $INSTALL_LOC/Backup/Configs/$SELECTED | spong
 fi
 done
 whiptail --fb --msgbox --title "Completed" "Your server is now running version: $SELECTED_VERSION" 10 60 0
+$WATCH_START
 source /opt/ELSM/Files/conf.cfg
 do_menu
 }
@@ -421,17 +422,6 @@ if [ ! $UPGRADE_VERSIONS = "1" ]; then
 fi
 }
 
-##Simple check to make sure there is actually a server built##
-##############################################################
-if [ ! -f $DIR/EcoServer.exe ]; then
-do_install
-fi
-do_update
-##We will now ask about ECO upgrades.
-do_ECO_upgrade_check
-
-source /opt/ELSM/Files/conf.cfg
-
 do_menu() {
 while true; do
   FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
@@ -463,6 +453,16 @@ RET=$?
 done
 }
 
+##Simple check to make sure there is actually a server built##
+##############################################################
+if [ ! -f $DIR/EcoServer.exe ]; then
+do_install
+fi
+do_update
+##We will now ask about ECO upgrades.
+do_ECO_upgrade_check
+
+source /opt/ELSM/Files/conf.cfg
 
 do_info(){
 if screen -list | grep -q "ECO"; then
