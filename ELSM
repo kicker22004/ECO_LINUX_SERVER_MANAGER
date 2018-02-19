@@ -14,7 +14,7 @@ $INSTALL_LOC/Files/update.sh
 do_no_menu_start() {
   if ! screen -list | grep -q "ECO"; then
      cd $DIR
-     $START
+     $WATCH_START
   else
      echo "Server was found running... close it before running this"
   fi
@@ -104,7 +104,6 @@ do_first_run() {
         sleep 1
         echo XXX
         echo 20
-#	do_start_config
         echo "Inputing user selection"
         echo XXX
         sleep 1
@@ -118,7 +117,7 @@ do_first_run() {
         echo "LONG WAIT, UP TO 1HOUR!!!!"
 	source /opt/ELSM/Files/conf.cfg
 	cd $DIR
-	$START
+	$WATCH_START
        echo XXX
         #Allow the server 1hour minutes to load..
         #If server doesn't go down, Force it.
@@ -169,7 +168,7 @@ exit 0
 do_start() {
  if ! screen -list | grep -q "ECO"; then
     cd $DIR
-    $START
+    $WATCH_START
     whiptail --fb --msgbox "Your Server is loading up please check the client after a bit of time..." 20 60 1
 else
     whiptail --fb --msgbox "Found a server running please stop it first!" 20 60 1
@@ -307,6 +306,10 @@ do_menu
 }
 
 do_restore() {
+whiptail --fb --yesno "THIS IS ONLY IF YOUR UPGRADE FAILED... NOT THE SAME AS ROLLBACK!" 10 60 \
+    --yes-button Yes --no-button No
+  RET=$?
+  if [ $RET -eq 0 ]; then
 rm -rf $DIR/*
 cd $INSTALL_LOC/Archives/
 tar -xf UPGRADE_ROLLBACK.tar.gz -C $DIR
@@ -314,13 +317,79 @@ mv $DIR/conf.cfg /$INSTALL_LOC/Files/
 whiptail --fb --msgbox --title "Emergency Recovery" "Your server was restored to your last backup!" 10 60 0
 source /opt/ELSM/Files/conf.cfg
 do_menu
+fi
 }
+
+do_rollback() {
+ROLLBACK=$(ls $DIR/Storage/Backup/ | awk '{print $1 " |"}')
+
+if [ ! $ROLLBACK ]; then
+	whiptail --msgbox --fb --title "NOTHING FOUND!" "You have no backups to fallback to." 10 60
+else
+	whiptail --msgbox --fb --title "Stopping ECO server" "This requires the server to be stopped, Stopping now." 10 60 0
+	$WATCH_STOP
+$STOP
+	SELECTED_BACKUP=$(whiptail --menu --fb "Select Your ECO backup." 20 60 10 ${ROLLBACK[@]} 3>&1 1>&2 2>&3)
+	RET=$?
+	if [ $RET -eq 0 ]; then
+		cd $DIR/Storage/Backup/
+		cp $SELECTED_BACKUP ../Game.eco
+	fi
+fi
+}
+
+do_map_reset() {
+whiptail --fb --yesno "This will reset your world and backups, A new world will be built...Continue?" 10 60 \
+    --yes-button Yes --no-button No
+  RET=$?
+  if [ $RET -eq 0 ]; then
+	$WATCH_STOP
+	$STOP
+	rm -rf $DIR/Storage/*
+	$WATCH_START
+	whiptail --msgbox --fb "Your server is now Generating the new world!, please give it time." 15 60
+fi
+}
+
+do_complete_wipe() {
+whiptail --fb --yesno "This will completely erase your server and configs...Continue?" 10 60 \
+    --yes-button Yes --no-button No
+  RET=$?
+  if [ $RET -eq 0 ]; then
+       $WATCH_STOP
+       $STOP
+       rm -rf $DIR/*
+	do_install
+        whiptail --msgbox --fb "Your server is now Generating the new world!, please give it time." 15 60
+fi
+}
+
+do_reset_menu() {
+while true; do
+  FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
+    "1 Map Reset" "[Simple world erase, Saving configs.]" \
+    "2 Server Reset" "[Erase everything, including configs..]" \
+  3>&1 1>&2 2>&3)
+RET=$?
+   if [ $RET -eq 0 ]; then
+    case "$FUN" in
+      1\ *) do_map_reset ;;
+      2\ *) do_complete_wipe ;;
+ *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+    esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+  elif [ $RET -eq 1 ]; then
+  do_menu
+  fi
+done
+}
+
 
 do_upgrade_menu() {
 while true; do
   FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
     "1 Upgrade" "[Upgrade ECO]" \
-    "2 Restore" "[Fallback to the last upgrade attempt.]" \
+    "2 Rollback" "[Rollback from ECO backups]" \
+    "3 Restore" "[Fallback to working server prior to upgrade attempt.]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -328,7 +397,8 @@ RET=$?
   elif [ $RET -eq 0 ]; then
     case "$FUN" in
       1\ *) do_upgrade ;;
-      2\ *) do_restore ;;
+      2\ *) do_rollback ;;
+      3\ *) do_restore ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
@@ -351,7 +421,6 @@ if [ ! $UPGRADE_VERSIONS = "1" ]; then
 fi
 }
 
-do_menu() {
 ##Simple check to make sure there is actually a server built##
 ##############################################################
 if [ ! -f $DIR/EcoServer.exe ]; then
@@ -362,6 +431,8 @@ do_update
 do_ECO_upgrade_check
 
 source /opt/ELSM/Files/conf.cfg
+
+do_menu() {
 while true; do
   FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
     "1 Start" "[Attempts to start the server]" \
@@ -369,7 +440,8 @@ while true; do
     "3 Restart" "[Restart the server]" \
     "4 Configs" "[Allows you to make changes to config files]" \
     "5 Upgrade/Fallback" "[Upgrade ECO or fallback after failed upgrade.]" \
-    "6 Info" "[Fast information about the server.]" \
+    "6 Server Reset menu" "[Map wipes or complete server wipes!]" \
+    "7 Info" "[Fast information about the server.]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -381,7 +453,8 @@ RET=$?
       3\ *) do_restart ;;
       4\ *) do_start_config ;;
       5\ *) do_upgrade_menu ;;
-      6\ *) do_info ;;
+      6\ *) do_reset_menu ;;
+      7\ *) do_info ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
