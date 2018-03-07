@@ -205,8 +205,9 @@ do_Qstop() {
 do_install() {
 ###Grab a list and see what we can do with it##
 cd $INSTALL_LOC/Files
-GETLIST=$(wget -q https://s3-us-west-2.amazonaws.com/eco-releases -O list.xml)
-eco_server_list=$(cat list.xml | grep -o "EcoServer_........-beta.zip" | sort -r | awk '{print $1 " |"}')
+cd $INSTALL_LOC/Files
+GETLIST=$(wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt)
+eco_server_list=$(cat server_version.txt | sort -r | awk '{print $1 " |"}')
 cd $INSTALL_LOC
 
 SELECTED_VERSION=$(whiptail --menu --fb "Select Your ECO server." 20 60 10 ${eco_server_list[@]} 3>&1 1>&2 2>&3)
@@ -241,10 +242,10 @@ if screen -list | grep -q "ECO"; then
 fi
 
 cd $INSTALL_LOC/Files
-GETLIST=$(wget -q https://s3-us-west-2.amazonaws.com/eco-releases -O list.xml)
-eco_server_list=$(cat list.xml | grep -o "EcoServer_........-beta.zip" | sort -r > list)
-UPGRADE_VERSIONS=$(cat list | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
-UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' list | sort -r | awk '{print $1 " |"}')
+wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt 
+UPGRADE_VERSIONS=$(cat server_version.txt | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
+UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' server_version.txt | sort -r | awk '{print $1 " |"}')
+echo "This is your Upgrade_list: $UPGRADE_LIST"
 
 if [ $UPGRADE_VERSIONS = "1" ]; then
         whiptail --fb --msgbox --title "Latest Version found!" "You're currently running the latest ECO Beta, Check back later" 10 70 0
@@ -410,10 +411,9 @@ done
 
 do_ECO_upgrade_check() {
 cd $INSTALL_LOC/Files
-GETLIST=$(wget -q https://s3-us-west-2.amazonaws.com/eco-releases -O list.xml)
-eco_server_list=$(cat list.xml | grep -o "EcoServer_........-beta.zip" | sort -r > list)
-UPGRADE_VERSIONS=$(cat list | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
-UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' list | sort -r | awk '{print $1 " |"}')
+wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt
+UPGRADE_VERSIONS=$(cat server_version.txt | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
+UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' server_version.txt | sort -r | awk '{print $1 " |"}')
 
 if [ ! $UPGRADE_VERSIONS = "1" ]; then
 	if (whiptail --fb --title "ECO Upgrade Notice!" --yesno "There were ECO upgrades found!, Would you like to update now?" 10 78) then
