@@ -101,6 +101,7 @@ If you agree Please, continue." 15 60) then
         echo 20
         echo "Making Directories & Moving Files"
         mkdir $INSTALL_LOC
+	mkdir $INSTALL_LOC/Archives
 	mkdir $INSTALL_LOC/Backup
 	mkdir $INSTALL_LOC/Files
 	mkdir $INSTALL_LOC/Files/ELSM_LOGS
