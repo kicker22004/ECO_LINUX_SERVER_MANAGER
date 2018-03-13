@@ -322,23 +322,23 @@ do_menu
 fi
 }
 
-do_rollback() {
-ROLLBACK=$(ls $DIR/Storage/Backup/ | awk '{print $1 " |"}')
+#do_rollback() {
+#ROLLBACK=$(ls $DIR/Storage/Backup/ | awk '{print $1 " |"}')
 
-if [ ! $ROLLBACK ]; then
-	whiptail --msgbox --fb --title "NOTHING FOUND!" "You have no backups to fallback to." 10 60
-else
-	whiptail --msgbox --fb --title "Stopping ECO server" "This requires the server to be stopped, Stopping now." 10 60 0
-	$WATCH_STOP
-$STOP
-	SELECTED_BACKUP=$(whiptail --menu --fb "Select Your ECO backup." 20 60 10 ${ROLLBACK[@]} 3>&1 1>&2 2>&3)
-	RET=$?
-	if [ $RET -eq 0 ]; then
-		cd $DIR/Storage/Backup/
-		cp $SELECTED_BACKUP ../Game.eco
-	fi
-fi
-}
+#if [ ! $ROLLBACK ]; then
+#	whiptail --msgbox --fb --title "NOTHING FOUND!" "You have no backups to fallback to." 10 60
+#else
+#	whiptail --msgbox --fb --title "Stopping ECO server" "This requires the server to be stopped, Stopping now." 10 60 0
+#	$WATCH_STOP
+#$STOP
+#	SELECTED_BACKUP=$(whiptail --menu --fb "Select Your ECO backup." 20 60 10 ${ROLLBACK[@]} 3>&1 1>&2 2>&3)
+#	RET=$?
+#	if [ $RET -eq 0 ]; then
+#		cd $DIR/Storage/Backup/
+#		cp $SELECTED_BACKUP ../Game.eco
+#	fi
+#fi
+#}
 
 do_map_reset() {
 whiptail --fb --yesno "This will reset your world and backups, A new world will be built...Continue?" 10 60 \
@@ -390,8 +390,8 @@ do_upgrade_menu() {
 while true; do
   FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
     "1 Upgrade" "[Upgrade ECO]" \
-    "2 Rollback" "[Rollback from ECO backups]" \
-    "3 Restore" "[Fallback to working server prior to upgrade attempt.]" \
+#    "2 Rollback" "[Rollback from ECO backups]" \
+    "2 Restore" "[Fallback to working server prior to upgrade attempt.]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -399,8 +399,8 @@ RET=$?
   elif [ $RET -eq 0 ]; then
     case "$FUN" in
       1\ *) do_upgrade ;;
-      2\ *) do_rollback ;;
-      3\ *) do_restore ;;
+#      2\ *) do_rollback ;;
+      2\ *) do_restore ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
