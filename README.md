@@ -1,6 +1,19 @@
 # ECO_LINUX_SERVER_MANAGER
 This is an easy to use set of scripts to host an ECO server on linux.
 
+
+YOU NEVER WANT TO RUN THIS AS ROOT USER... IT WILL BREAK 100% OF THE TIME.
+
+So lets make a user using root.
+
+`adduser eco`
+
+Give sudo permissions (Only used to make ELSM gobal)
+
+`usrmod -a -G sudo eco`
+
+Then log into that user with the username and password you just made.
+
 To install, run these simple commands.
 
 `git clone https://github.com/kicker22004/ECO_LINUX_SERVER_MANAGER.git`
