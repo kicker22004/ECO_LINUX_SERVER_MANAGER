@@ -2,16 +2,16 @@
 INSTALL_LOC=/opt/ELSM
 CONFIG=$INSTALL_LOC/Files/conf.cfg
 ###############################
-###      Version 0.1.2     ###
+###      Version 0.1.3     ###
 ###############################
 
 cd $INSTALL_LOC/Files
 
 do_changelog() {
         cat <<EOF >> changelog
-1. Server Files are now hidden so forced to do things the old way....
+1. Hotfix for the upgrade function, Rollback removed for now as it causes issues.
 EOF
-whiptail --fb --title "ELSM Changelog 0.1.2" --textbox changelog 20 60
+whiptail --fb --title "ELSM Changelog 0.1.3" --textbox changelog 20 60
 rm changelog
 }
 
@@ -20,7 +20,6 @@ do_update() {
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/ELSM -O ELSM
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/conf.cfg -O conf.cfg
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/update.sh -O update.sh
-	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/Config_mods.txt -O Config_mods.txt
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/watch.sh -O watch.sh
 	clear
 	echo "Root is needed to install ELSM in (/usr/bin/)"
