@@ -39,7 +39,7 @@ source $DIR/$SELECTED_DIR/conf.cfg
 SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
 MONITOR="${SESSIONID}.${SELECTED_DIR}"
   if ! screen -list | grep -o "${MONITOR}"; then
-     cd $DIR/$SELECTED_DIR
+     cd $INSTALL_LOC/Files/
      $WATCH_START "${SELECTED_DIR[@]}"
   else
      echo "Server was found running... close it before running this"
@@ -163,7 +163,7 @@ do_first_run() {
               fi
               done
 	if ! screen -list | grep -o "${SESSIONID}"; then
-		cd $DIR/$SELECTED_DIR
+		cd $INSTALL_LOC/Files/
 		$WATCH_START "${SELECTED_DIR[@]}"
 	fi
 	echo 60
@@ -192,7 +192,7 @@ do_start() {
 SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
 MONITOR="${SESSIONID}.${SELECTED_DIR}"
   if ! screen -list | grep -o "${MONITOR}"; then
-	cd $DIR/$SELECTED_DIR
+	cd $INSTALL_LOC/Files/
 	$WATCH_START "${SELECTED_DIR[@]}"
     whiptail --fb --msgbox "Your Server is loading up please check the client after a bit of time..." 20 60 1
 else
@@ -200,7 +200,7 @@ else
     do_Qstop
 fi
 if ! screen -list | grep -q "WATCH"; then
-     cd $DIR/$SELECTED_DIR
+     cd $INSTALL_LOC/Files/
      $WATCH_START "${SELECTED_DIR[@]}"
 fi
 }
@@ -389,7 +389,7 @@ whiptail --fb --yesno "This will reset your world and backups, A new world will 
     --yes-button Yes --no-button No
   RET=$?
   if [ $RET -eq 0 ]; then
-	cd $DIR/$SELECTED_DIR
+	cd $INSTALL_LOC/Files/
 	$WATCH_STOP
 	$STOP
 	rm -rf $DIR/$SELECTED_DIR/Storage/*
