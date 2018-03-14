@@ -1,10 +1,6 @@
 # ECO_LINUX_SERVER_MANAGER
 This is an easy to use set of scripts to host an ECO server on linux.
 
-
-DON'T INSTALL THIS RIGHT NOW (3/14/18). IT'S CURRENTLY BROKEN AND WILL CAUSE MORE ISSUES THEN NEEDED. PLEASE STAND BY.
-
-
 STEPS TO MOVE FROM 0.1.4 - 2.0!!
  
  We will be backing up your world and them moving it all over. This seems to be the best way to handle this.
