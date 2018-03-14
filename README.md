@@ -5,6 +5,31 @@ This is an easy to use set of scripts to host an ECO server on linux.
 DON'T INSTALL THIS RIGHT NOW (3/14/18). IT'S CURRENTLY BROKEN AND WILL CAUSE MORE ISSUES THEN NEEDED. PLEASE STAND BY.
 
 
+STEPS TO MOVE FROM 0.1.4 - 2.0!!
+ 
+ We will be backing up your world and them moving it all over. This seems to be the best way to handle this.
+ Start by stopping your current world!
+ 
+ `ELSM stop`
+ 
+      * cp -a /opt/ELSM/Server/. $HOME/ELSMBACKUP
+      
+    Check that your server files are in the new location.
+      * ls $HOME/ELSMBACKUP
+      
+    If all is good then continue. DO NOT IF YOUR FILES WERE NOT LISTED ON THE LAST COMMAND!!!!!
+      * sudo rm -rf /opt/ELSM
+    
+    That is going to remove ELSM from your server. Follow the steps below and have ELSM create a new world, Use Little_Big_planet for speed.(Same version you were running is best. Example EcoServer_v0.7.2.3
+    
+    Once you have created the user below and made the world go ahead and stop it again.
+      * rm -rf /opt/ELSM/Server/ECO/*      (If you named your server something else with ELSM then use that name instead of ECO.
+    Now move your server over to your new folder.
+      
+      * cp -a $HOME/ELSMBACKUP/. /opt/ELSM/Server/ECO/    (Again change ECO for your folder name if different.)
+      
+      That should do it.
+
 YOU NEVER WANT TO RUN THIS AS ROOT USER... IT WILL BREAK 100% OF THE TIME.
 
 So lets make a user using root.
