@@ -24,6 +24,8 @@ STEPS TO MOVE FROM 0.1.4 - 2.0!!
       
       * cp -a $HOME/ELSMBACKUP/. /opt/ELSM/Server/ECO/    (Again change ECO for your folder name if different.)
       
+      * cp /opt/ELSM/Files/conf.cfg /opt/ELSM/Server/ECO/conf.cfg
+      
       That should do it.
 
 YOU NEVER WANT TO RUN THIS AS ROOT USER... IT WILL BREAK 100% OF THE TIME.
