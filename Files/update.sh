@@ -12,6 +12,8 @@ case "$1" in
     ;;
 esac
 
+##Killing this until I can fix bugs.
+exit 1
 ## This should stop the crash moving to ELSM 2.0
 if [ -z $SELECTED_DIR ]; then
 mkdir /opt/ELSM/ELSM2_Backup
