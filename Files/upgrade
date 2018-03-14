@@ -2,7 +2,7 @@
 INSTALL_LOC=/opt/ELSM
 CONFIG=$INSTALL_LOC/Files/conf.cfg
 ###############################
-###      Version 0.1.3     ###
+###      Version 0.1.4     ###
 ###############################
 
 cd $INSTALL_LOC/Files
@@ -11,7 +11,7 @@ do_changelog() {
         cat <<EOF >> changelog
 1. Hotfix for the upgrade function, Rollback removed for now as it causes issues.
 EOF
-whiptail --fb --title "ELSM Changelog 0.1.3" --textbox changelog 20 60
+whiptail --fb --title "ELSM Changelog 0.1.4" --textbox changelog 20 60
 rm changelog
 }
 
