@@ -13,7 +13,7 @@ So lets make a user using root.
 
 Give sudo permissions (Only used to make ELSM gobal)
 
-`usrmod -a -G sudo eco`
+`usermod -a -G sudo eco`
 
 Then log into that user with the username and password you just made.
 
