@@ -3,7 +3,7 @@ This is an easy to use set of scripts to host an ECO server on linux.
 
 STEPS TO MOVE FROM 0.1.4 - 2.0!!
  
- We will be backing up your world and them moving it all over. This seems to be the best way to handle this.
+ We will be backing up your world and then moving it all over. This seems to be the best way to handle this.
  Start by stopping your current world!
  
  `ELSM stop`
