@@ -28,6 +28,7 @@ echo "==============================================================
 " > $LOG_FILE
 
 ##Attempt to start ECO Before 10 second loop.
+cd $DIR/$SELECTED_DIR/
 $START
 sleep 2
 SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
@@ -44,6 +45,7 @@ Failure counter is at: $COUNTER out of 3
     sleep 1
     SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
     MONITOR="${SESSIONID}.${SELECTED_DIR}"
+    echo $SESSIONDI/$MONITOR
     let COUNTER=COUNTER+1
     sleep 1m
 }
