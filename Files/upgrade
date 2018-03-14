@@ -1,24 +1,33 @@
 #!/bin/bash
-INSTALL_LOC=/opt/ELSM
-CONFIG=$INSTALL_LOC/Files/conf.cfg
+
+case "$1" in
+   (*)
+    SELECTED_DIR=$1
+    DIR="/opt/ELSM/Server"
+    ;;
+esac
+
+source $DIR/$SELECTED_DIR/conf.cfg
+CONFIG="${DIR}/${SELECTED_DIR}/conf.cfg"
+echo "This is the selected files: $SELECTED_DIR"
 ###############################
-###      Version 0.1.4     ###
+###      Version 0.2.0     ###
 ###############################
 
-cd $INSTALL_LOC/Files
+cd $INSTALL_LOC/Files/
 
 do_changelog() {
         cat <<EOF >> changelog
-1. Hotfix for the upgrade function, Rollback removed for now as it causes issues.
+1. This was covered in the Update script.
 EOF
-whiptail --fb --title "ELSM Changelog 0.1.4" --textbox changelog 20 60
+whiptail --fb --title "ELSM Changelog 0.2.0" --textbox changelog 20 60
 rm changelog
 }
 
 do_update() {
-	cp $CONFIG $INSTALL_LOC/Files/conf.cfg.bak
+	cp $CONFIG $DIR/$SELECTED_DIR/conf.cfg.bak
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/ELSM -O ELSM
-	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/conf.cfg -O conf.cfg
+	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/conf.cfg -O $DIR/$SELECTED_DIR/conf.cfg
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/update.sh -O update.sh
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/watch.sh -O watch.sh
 	clear
@@ -26,23 +35,22 @@ do_update() {
 	sudo mv ELSM /usr/bin/
 	sudo chmod +x /usr/bin/ELSM
 	chmod +x /opt/ELSM/Files/update.sh
-	chmod +x /opt/ELSM/Files/upgrade
 	chmod +x /opt/ELSM/Files/watch.sh
 
 ##Grab old info and copy it to the new conf.cfg##
 #################################################
-	source $INSTALL_LOC/Files/conf.cfg.bak
+	source $DIR/$SELECTED_DIR/conf.cfg.bak
 	sed -i "s/ECO_VERSION=.*/ECO_VERSION=$ECO_VERSION/g" $CONFIG
 	sed -i "s/check=.*/check=$check/g" $CONFIG
 	sed -i "s/startonboot=.*/startonboot=$startonboot/g" $CONFIG
 }
 
-if [ -f /opt/ELSM/Files/conf.cfg ]; then
+if [ -f $DIR/$SELECTED_DIR/conf.cfg ]; then
 	do_changelog
 	do_update
 else
 	whiptail --msgbox --fb "Sorry it seems that your ELSM installation is not complete. Leaving." 20 60 0
 	clear
-	echo "No conf.cfg found in /opt/ELSM/Files/" ; exit 1
+	echo "No conf.cfg found in ${DIR}/${SELECTED_DIR}" ; exit 1
 fi
 exit 0
