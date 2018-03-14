@@ -29,8 +29,7 @@ rm -rf /opt/ELSM/Server/*
 cd ECO_LINUX_SERVER_MANAGER
 sudo mv ELSM /usr/bin/ELSM
 cp Files/* /opt/ELSM/Files/
-mkdir /opt/ELSM/Server/ECO
-cp -a /opt/ELSM/ELSM2_Backup/. /opt/ELSM/Server/ECO/
+cp -a /opt/ELSM/ELSM2_Backup/. /opt/ELSM/Server/ECO
 cp /opt/ELSM/Files/conf.cfg /opt/ELSM/Server/ECO/conf.cfg
 cat <<EOF >> changelog
 1. Your server was killed, I would NEVER do this if I could avoid it!.
