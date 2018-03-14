@@ -1,5 +1,7 @@
 #!/bin/bash
-source /opt/ELSM/Files/conf.cfg
+DIR="/opt/ELSM/Server"
+source $DIR/$SELECTED_DIR/conf.cfg
+LOG_DIR="/opt/ELSM/Files/ELSM_LOGS"
 NOW=$(date "+%FT%T")
 
 ###Save last log###
@@ -21,6 +23,8 @@ echo "==============================================================
 ##Attempt to start ECO Before 10 second loop.
 $START
 sleep 2
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
+MONITOR="${SESSIONID}.${SELECTED_DIR}"
 do_restart() {
 ###Make a new logfile for the start.###
 echo $(date) >> $LOG_FILE
@@ -28,8 +32,11 @@ echo "The server is down!, Attempting to restart.
 Failure counter is at: $COUNTER out of 3
 
 " >> $LOG_FILE
-    cd $DIR
+    cd $DIR/$SELECTED_DIR
     $START
+    sleep 1
+    SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
+    MONITOR="${SESSIONID}.${SELECTED_DIR}"
     let COUNTER=COUNTER+1
     sleep 1m
 }
@@ -37,8 +44,8 @@ Failure counter is at: $COUNTER out of 3
 #Watch for the screen to be live every 30 seconds
 COUNTER=0
 while true; do
-sleep 10s
-   if screen -list | grep -q "ECO"; then
+sleep 5s
+   if screen -list | grep -o "${MONITOR}"; then
     COUNTER=0
 else
     #We have spotted a crash of some form so let's restart the server and give it extra time.
