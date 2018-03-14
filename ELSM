@@ -390,7 +390,6 @@ do_upgrade_menu() {
 while true; do
   FUN=$(whiptail --fb --title "Main Menu, Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
     "1 Upgrade" "[Upgrade ECO]" \
-#    "2 Rollback" "[Rollback from ECO backups]" \
     "2 Restore" "[Fallback to working server prior to upgrade attempt.]" \
   3>&1 1>&2 2>&3)
 RET=$?
@@ -399,7 +398,6 @@ RET=$?
   elif [ $RET -eq 0 ]; then
     case "$FUN" in
       1\ *) do_upgrade ;;
-#      2\ *) do_rollback ;;
       2\ *) do_restore ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
