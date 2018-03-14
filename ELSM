@@ -31,8 +31,6 @@ fi
 
 
 do_update() {
-#cd $INSTALL_LOC/Files/
-#wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/update.sh -O update.sh
 $INSTALL_LOC/Files/update.sh "${SELECTED_DIR[@]}"
 }
 
