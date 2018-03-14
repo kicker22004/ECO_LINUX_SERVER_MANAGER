@@ -45,7 +45,7 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
      echo "Server was found running... close it before running this"
   fi
   if ! screen -list | grep -q "WATCH"; then
-     cd $DIR/$SELECTED_DIR
+     cd $INSTALL_LOC/Files/
      $WATCH_START "${SELECTED_DIR[@]}"
   fi
 }
@@ -55,7 +55,6 @@ source $DIR/$SELECTED_DIR/conf.cfg
 SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
 MONITOR="${SESSIONID}.${SELECTED_DIR}"
   if screen -list | grep -o "${MONITOR}"; then
-    cd $DIR/$SELECTED_DIR
     $WATCH_STOP
     screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
   else
@@ -142,7 +141,7 @@ do_first_run() {
         echo 50
         echo "LONG WAIT, UP TO 1HOUR!!!!"
 	source $DIR/$SELECTED_DIR/conf.cfg
-	cd $DIR/$SELECTED_DIR
+	cd $INSTALL_LOC/Files/
 	$WATCH_START "${SELECTED_DIR[@]}"
         echo XXX
         #Allow the server 1hour minutes to load..
@@ -421,8 +420,6 @@ if [ $RET -eq 1 ]; then
 exit 1
 elif [ $RET -eq 0 ]; then
 cd $DIR/$SELECTED_DIR
-echo $DIR
-echo $DIR/$SELECTED_DIR
 sed -i 's:SELECTED_DIR=.*:SELECTED_DIR='$SELECTED_DIR':g' conf.cfg
 
 if [ ! -f  /opt/ELSM/Server/$SELECTED_DIR/conf.cfg ]; then
