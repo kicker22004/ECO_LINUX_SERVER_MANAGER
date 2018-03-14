@@ -1,5 +1,12 @@
 #!/bin/bash
-DIR="/opt/ELSM/Server"
+
+case "$1" in
+   (*)
+    SELECTED_DIR=$1
+    DIR="/opt/ELSM/Server"
+    ;;
+esac
+
 source $DIR/$SELECTED_DIR/conf.cfg
 LOG_DIR="/opt/ELSM/Files/ELSM_LOGS"
 NOW=$(date "+%FT%T")
