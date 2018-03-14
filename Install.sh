@@ -106,8 +106,6 @@ If you agree Please, continue." 15 60) then
 	mkdir $INSTALL_LOC/Files
 	mkdir $INSTALL_LOC/Files/ELSM_LOGS
         mkdir $INSTALL_LOC/Server
-	mkdir $INSTALL_LOC/Server/Storage
-	mkdir $INSTALL_LOC/Server/Storage/Backup
 	touch $INSTALL_LOC/Files/ELSM_LOGS/ELSM.log
 	cp Files/* $INSTALL_LOC/Files
         echo XXX
