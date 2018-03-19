@@ -28,6 +28,7 @@ do_update() {
 	cp $CONFIG $DIR/$SELECTED_DIR/conf.cfg.bak
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/ELSM -O ELSM
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/conf.cfg -O $DIR/$SELECTED_DIR/conf.cfg
+	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/conf.cfg -O $INSTALL_LOC/Files/conf.cfg
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/update.sh -O update.sh
 	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/watch.sh -O watch.sh
 	clear
