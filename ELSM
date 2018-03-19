@@ -119,16 +119,49 @@ fi
 do_start_easy_config() {
   #Set the size of the world
   do_world_size
-  #Set the description
-  port=$(whiptail --title "Server Ports" --inputbox "Enter the server's port (For the game)" 10 60 "" 3>&1 1>&2 2>&3)
+  SEL="Network"
+  #Set the server's port
+  Gport=$(whiptail --title "Server Ports" --inputbox "Enter the server's port (For the game)" 10 60 "3000" 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
-    #Set the port in config file
+    #Ask for the web port
+    Wport=$(whiptail --title "Server Ports" --inputbox "Enter the web server's port (Must be different)" 10 60 "3001" 3>&1 1>&2 2>&3)
+    exitstatus=$?
+    if [ $exitstatus = 0 ]; then
+    #Check if the user entered int
+      if [[ $Gport =~ '^[0-9]+$' || $Wport =~ '^[0-9]+$' ]]; then
+       # Check if ports is already taken
+        if [ -z netstat -an |grep $Gport |grep LISTEN ]; then
+          if [ -z netstat -an |grep $Wport |grep LISTEN ]; then
+            #Set the ports in config file
+            jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+            jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+          else
+            echo "Port already taken"
+            do_start_easy_config
+            return
+          fi
+        else
+          echo "Port already taken"
+          do_start_easy_config
+          return
+        fi
+      else
+        echo "Not a number"
+        do_start_easy_config
+        return
+      fi
+    else
+      #Exit
+      echo "Exited"
+      exit 1
+    fi
   else
     #Exit
     echo "Exited"
     exit 1
   fi
+  
 }
 do_start_config() {
   #We start with the server name
