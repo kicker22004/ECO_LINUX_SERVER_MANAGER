@@ -78,7 +78,7 @@ fi
 
 
 ### List options that we want in simple edit.
-do_start_config() {
+do_start_advanced_config() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 ##Get the lists!
 unset FALLBACK SEL LIST
@@ -90,7 +90,6 @@ if [ $RET -eq 0 ]; then
 do_main_config
 fi
 }
-
 do_world_size() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="WorldGenerator"
@@ -117,7 +116,28 @@ jq '.Dimensions.x = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 }
-
+do_start_easy_config() {
+  #Set the size of the world
+  do_world_size
+  #Set the description
+  port=$(whiptail --title "Server Ports" --inputbox "Enter the server's port (For the game)" 10 60 "" 3>&1 1>&2 2>&3)
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+    #Set the port in config file
+  else
+    #Exit
+    echo "Exited"
+    exit 1
+  fi
+}
+do_start_config() {
+  #We start with the server name
+  if (whiptail --title "Server install" --yesno "There are two types of installation: \n Easy: for new users, you will need any skill for this \n Advanced: Edit yourself the config files"  --yes-button "Basic" --no-button "Advanced" 10 60) then
+    do_start_easy_config
+  else
+    do_start_advanced_config
+  fi
+}
 do_main_config() {
 nano $CONFIGS/$SEL.eco
 $FALLBACK
@@ -585,7 +605,7 @@ RET=$?
       1\ *) do_start ;;
       2\ *) do_stop ;;
       3\ *) do_restart ;;
-      4\ *) do_start_config ;;
+      4\ *) do_start_advanced_config ;;
       5\ *) do_multi_check ;;
       6\ *) do_upgrade ;;
       7\ *) do_reset_menu ;;
