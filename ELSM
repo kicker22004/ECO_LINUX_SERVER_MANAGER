@@ -167,7 +167,7 @@ easy-config_serverType() {
         ;;
         "Private with password")
           jq '.PublicServer = false' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-
+          easy-config_serverPassword
         ;;
       esac  
   else
