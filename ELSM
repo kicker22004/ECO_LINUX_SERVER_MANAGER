@@ -152,7 +152,7 @@ do_stagetwo() {
 	clear
 	screen -S $SELECTED_DIR -p 0 -X stuff "exit $(printf \\r)"
 	screen -r $SELECTED_DIR 
-read -p "Did the server build correctly?" -n 1 -r 
+read -p "Did the server build correctly? YES/NO" -n 1 -r 
 echo # (optional) move to a new line 
 if [[ $REPLY =~ ^[Yy]$ ]] 
 then
