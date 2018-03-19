@@ -24,7 +24,7 @@ echo $DIR/$SELECTED_DIR
         find=$(cat tmp | cut -d "=" -f2)
         clear
         echo -e ${yellow}"Version found online: $find"
-        unset BSCC_VERSION
+        unset ELSM_VERSION
         source $DIR/$SELECTED_DIR/conf.cfg
         echo "Currently Installed Version: $ELSM_VERSION"
 	echo -e ${green}"Created and Maintained by: Kicker22004"
