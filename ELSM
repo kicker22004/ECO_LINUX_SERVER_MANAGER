@@ -94,6 +94,7 @@ WG_SIZE=$(whiptail --fb --title "World Size" --radiolist "Choose: (Spacebar to s
   "1X (Default)" "[100x100 World]" on \
   "2X" "[140x140 World]" off \
   "4X" "[200x200 World]" off \
+  "Custom" "[Choose your world's size]"
   3>&1 1>&2 2>&3)
 if [ "$WG_SIZE" = "Little_Big_Planet" ]; then
 jq '.Dimensions.x = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
@@ -110,6 +111,11 @@ fi
 if [ "$WG_SIZE" = "4X" ]; then
 jq '.Dimensions.x = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if ["$WG_SIZE" = "Custom" ]; then
+size=$(whiptail --title "World Size" --inputbox "Enter the world's size:" 10 60 "100" 3>&1 1>&2 2>&3)
+jq ".Dimensions.x = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq ".Dimensions.y = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 }
 #Functions used for easy config
