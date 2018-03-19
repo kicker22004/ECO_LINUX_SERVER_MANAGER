@@ -1,3 +1,4 @@
+EcoServer_v0.7.2.5-beta.zip
 EcoServer_v0.7.2.4-beta.zip
 EcoServer_v0.7.2.3-beta.zip
 EcoServer_v0.7.2.2-beta.zip
