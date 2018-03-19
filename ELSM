@@ -602,7 +602,7 @@ done
 }
 
 do_info(){
-if screen -list | grep -q "ECO"; then
+if screen -list | grep -q "$SELECTED_DIR"; then
 STATUS="ONLINE"
 else
 STATUS="OFFLINE"
