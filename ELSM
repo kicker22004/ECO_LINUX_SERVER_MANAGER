@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 #Add color for info.
 green='\e[1;32m'
@@ -22,7 +22,7 @@ if [ ! -f $DIR/$SELECTED_DIR/EcoServer.exe ]; then
 do_newserver
 else
 echo "updates disabled"
-#do_update
+do_update
 ##We will now ask about ECO upgrades.
 do_ECO_upgrade_check
 fi
@@ -540,6 +540,11 @@ if [ ! $UPGRADE_VERSIONS = "1" ]; then
 fi
 }
 
+do_patreon() {
+whiptail --msgbox --fb "Thank you for at least looking at this link. I'll be adding a backer page if I ever get backers! https://www.patreon.com/kicker22004" 20 60 0
+
+}
+
 do_advanced_menu() {
 while true; do
   FUN=$(whiptail --fb --title "Advanced menu" --menu "WARNING!!!"  --cancel-button Back --ok-button Select 20 80 7 \
@@ -560,7 +565,7 @@ done
 do_menu() {
 do_startup
 while true; do
-  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 10 \
+  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 11 \
     "1 Start" "[Attempts to start the server]" \
     "2 Stop" "[Attempt to stop the server]" \
     "3 Restart" "[Restart the server]" \
@@ -571,6 +576,7 @@ while true; do
     "8 Multi Server menu" "[Create More servers!]" \
     "9 Advanced Menu" "[Sometimes you might need more tools...]" \
     "10 Info" "[Fast information about the server.]" \
+    "11 Say Thanks!" "[Link to Patreon page, Thank you]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -587,6 +593,7 @@ RET=$?
       8\ *) do_newserver ;;
       9\ *) do_advanced_menu ;;
       10\ *) do_info ;;
+      11\ *) do_patreon ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
