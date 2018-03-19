@@ -139,7 +139,7 @@ easy-config_serverPassword() {
     else
       echo "Password is empty."
       easy-config_serverPassword()
-      return
+      return 0
     fi
   else
     #Exit
@@ -203,17 +203,17 @@ do_start_easy_config() {
           else
             echo "Port already taken"
             do_start_easy_config
-            return
+            return 0
           fi
         else
           echo "Port already taken"
           do_start_easy_config
-          return
+          return 0
         fi
       else
         echo "Not a number"
         do_start_easy_config
-        return
+        return 0
       fi
     else
       #Exit
@@ -685,7 +685,7 @@ do_config_menu() {
   RET=$?
   if [ $RET -eq 1]; then
     do_menu
-    return
+    return 0
   elif [ $RET -eq 0]; then
     case "$Choice" in
     esac
