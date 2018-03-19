@@ -116,10 +116,75 @@ jq '.Dimensions.x = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 }
+#Functions used for easy config
+easy-config_serverDesc() {
+  CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+  SEL="Network"
+  #Ask for server desc
+  ServerName=$(whiptail --title "Server Name" --inputbox "Enter the server's description" 10 60 "Eco_LinuxServer" 3>&1 1>&2 2>&3)
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+    jq ".Description = \"${ServerName}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+
+  else
+    #Exit
+    echo "Exited"
+    exit 1
+  fi
+}
+easy-config_serverPassword() {
+  CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+  SEL="Network"
+  Password=$(whiptail --title "Server Password" --inputbox "Enter server password.\n Warning: EVERYONE having this password can access this server." 10 60 "very-secure-passw0rd" 3>&1 1>&2 2>&3)
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+    if ! [ -z $Password ]; then
+      jq ".Password = \"${Password}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+    else
+      echo "Password is empty."
+      easy-config_serverPassword()
+      return
+    fi
+  else
+    #Exit
+    echo "Exited"
+    exit 1
+  fi
+}
+easy-config_serverType() {
+  CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+  SEL="Network"
+  #Ask for server type
+  Type=$(whiptail --title "Server type" --radiolist \
+  "Choose your server auth type" 15 60 4 \
+  "Public" "Everyone can join your server" ON \
+  "Private" "Only whitelisted user can join the server" OFF \
+  "Private with password" "Only users with password can join your server" OFF 3>&1 1>&2 2>&3)
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+      case $Type in
+        "Public")
+          jq '.PublicServer = true' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+        ;;
+        "Private")
+          jq '.PublicServer = false' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+        ;;
+        "Private with password")
+          jq '.PublicServer = false' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+
+        ;;
+      esac  
+  else
+    #Exit
+      echo "Exited"
+      exit 1
+  fi
+}
 do_start_easy_config() {
   #Set the size of the world
   do_world_size
   SEL="Network"
+  CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   #Set the server's port
   Gport=$(whiptail --title "Server Ports" --inputbox "Enter the server's port (For the game)" 10 60 "3000" 3>&1 1>&2 2>&3)
   exitstatus=$?
@@ -136,6 +201,9 @@ do_start_easy_config() {
             #Set the ports in config file
             jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+            easy-config_serverDesc
+            easy-config_serverType
+            whiptail --title "Server Config" --msgbox "Server creation finished !" 10 60
           else
             echo "Port already taken"
             do_start_easy_config
