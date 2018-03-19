@@ -151,7 +151,7 @@ easy-config_serverType() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
   #Ask for server type
-  Type=$(whiptail --title "Server type" --radiolist \
+  Type=$(whiptail --title "Server type (Spacebar to choose, enter to confirm)" --radiolist \
   "Choose your server auth type" 15 60 4 \
   "Public" "Everyone can join your server" ON \
   "Private" "Only whitelisted user can join the server" OFF \
@@ -701,6 +701,53 @@ do_config_menu() {
     exit 1
   fi
 }
+do_easy_config_menu() {
+  while true; do
+    FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 11 \
+      "1 Server Name" "[Change the description]" \
+      "2 Change access permission" "[Public / Private]" \
+      "3 Return" "" \
+    3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+      do_config_choice_menu
+      return
+    elif [ $RET -eq 0 ]; then
+      case "$FUN" in
+        1\ *) easy-config_serverDesc ;;
+        2\ *) easy-config_serverType ;;
+        3\ *) 
+        return
+        ;;
+  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+      esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    else
+      exit 1
+    fi
+  done
+}
+do_config_choice_menu() {
+  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Choose edition of config editor"  --cancel-button Exit --ok-button "Select" 20 80 11 \
+    "Simple" "[For new users]" \
+    "Advanced" "[For who wants to edit files]" \
+  3>&1 1>&2 2>&3)
+  RET=$?
+  if [ $RET -eq 1 ]; then
+    do_menu
+    return
+  elif [ $RET -eq 0 ]; then
+    case "$FUN" in
+      "Simple")
+        do_easy_config_menu
+      ;;
+      "Advanced")
+        do_start_advanced_config
+      ;;
+    esac
+  else
+    exit 1
+  fi
+}
 do_menu() {
 do_startup
 while true; do
@@ -725,7 +772,7 @@ RET=$?
       1\ *) do_start ;;
       2\ *) do_stop ;;
       3\ *) do_restart ;;
-      4\ *) do_start_advanced_config ;;
+      4\ *) do_config_choice_menu ;;
       5\ *) do_multi_check ;;
       6\ *) do_upgrade ;;
       7\ *) do_reset_menu ;;
