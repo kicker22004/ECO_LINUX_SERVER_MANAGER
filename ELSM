@@ -21,7 +21,6 @@ source $DIR/$SELECTED_DIR/conf.cfg
 if [ ! -f $DIR/$SELECTED_DIR/EcoServer.exe ]; then
 do_newserver
 else
-echo "updates disabled"
 do_update
 ##We will now ask about ECO upgrades.
 do_ECO_upgrade_check
