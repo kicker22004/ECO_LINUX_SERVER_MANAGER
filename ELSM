@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 #Add color for info.
 green='\e[1;32m'
@@ -126,6 +126,9 @@ $FALLBACK
 
 do_first_run() {
 (
+	##Lets kill anything that even looks like the named server we are building.
+	$WATCH_STOP
+	$STOP
         sleep 1
         echo XXX
         echo 20
@@ -141,32 +144,33 @@ do_first_run() {
         echo 50
         echo "LONG WAIT, UP TO 1HOUR!!!!"
 	source $DIR/$SELECTED_DIR/conf.cfg
-	cd $INSTALL_LOC/Files/
-	$WATCH_START "${SELECTED_DIR[@]}"
+	cd $DIR/$SELECTED_DIR/
+	$START
         echo XXX
-        #Allow the server 1hour minutes to load..
-        #If server doesn't go down, Force it.
-	 for ((i=3600;i>0;i=i-1)); do
-                clear
-                ELSM_PID=$(lsof -Pi :$PORT -sTCP:LISTEN -t)
-                if [ -z $ELSM_PID ]; then
-#                echo -e ${yellow}"The ECO server is loading up for the first time!, Depending on your machine this could take A LONG TIME.. Please wait..."
-                echo -n "Time Remaining $i seconds, Before Failure.."
-               	if ! screen -list | grep -q "ECO"; then
-                	clear
-                	echo "For some reason your server failed to load and has crashed.... Please report this to the forum and attemt to run it manually to find clues..."
-                	exit 1
-                fi
-               sleep 1
-              else
-               break
-              fi
-              done
-	if ! screen -list | grep -o "${SESSIONID}"; then
-		cd $INSTALL_LOC/Files/
-		$WATCH_START "${SELECTED_DIR[@]}"
-	fi
-	echo 60
+	sleep 3) | whiptail --gauge "Gathering info" 8 40 0
+}
+do_stagetwo() {
+	clear
+	screen -S $SELECTED_DIR -p 0 -X stuff "exit $(printf \\r)"
+	screen -r $SELECTED_DIR 
+read -p "Did the server build correctly?" -n 1 -r 
+echo # (optional) move to a new line 
+if [[ $REPLY =~ ^[Yy]$ ]] 
+then
+    	cd $INSTALL_LOC/Files/
+	$WATCH_START "${SELECTED_DIR[@]}"
+	do_stagethree
+else
+	$STOP
+	$START
+	sleep 3
+	do_stagetwo
+fi
+}
+
+do_stagethree() {
+
+(	echo 60
         echo XXX
         echo 80
         echo "The sun is rising."
@@ -185,7 +189,6 @@ clear
 echo -e ${green}"Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:3001"
 echo -e ${yellow}"To run the ECO_LINUX_SERVER_MANAGER interface just type ${red}ELSM${yellow} in your terminal"
 tput sgr0
-echo $SELECTED_DIR
 }
 
 do_start() {
@@ -199,7 +202,7 @@ else
     whiptail --fb --msgbox "Found a server running please stop it first!" 20 60 1
     do_Qstop
 fi
-if ! screen -list | grep -q "WATCH"; then
+if ! screen -list | grep -o "${MONITOR}"; then
      cd $INSTALL_LOC/Files/
      $WATCH_START "${SELECTED_DIR[@]}"
 fi
@@ -207,8 +210,8 @@ fi
 
 
 do_stop() {
-SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
-MONITOR="${SESSIONID}.${SELECTED_DIR}"
+SESSIONID=( $(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}') )
+MONITOR="${SESSIONID}.${SELECTED_DIR[0]}"
   if ! screen -list | grep -o "${MONITOR}"; then
     whiptail --fb --msgbox "There is no Server running right now, did you start it?" 20 60 1
 else
@@ -223,18 +226,31 @@ do_Qstop() {
   if [ $RET -eq 0 ]; then
     cd $DIR/$SELECTED_DIR
     $WATCH_STOP
-    screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
+    screen -S ${MONITOR[0]} -p 0 -X stuff "exit $(printf \\r)"
     whiptail --fb --msgbox "Stopping Server.." 20 60 1
   fi
 }
 
+do_force_kill() {
+SESSIONID=( $(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}') )
+MONITOR="${SESSIONID}.${SELECTED_DIR[0]}"
+$WATCH_STOP
+$STOP
+sleep 3
+if ! screen -list | grep -o "${MONITOR}"; then
+whiptail --msgbox --fb "Your server had been killed, Returning to the main menu." 20 60 0
+do_menu
+fi
+}
 
 
 do_install() {
 INSTALL_LOC="/opt/ELSM"
+DIR="${INSTALL_LOC}/Server"
 ###Grab a list and see what we can do with it##
 cd $INSTALL_LOC/Files
-GETLIST=$(wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt)
+#GETLIST=$(wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt)
+GETLIST="${INSTALL_LOC}/Files/server_version.txt"
 eco_server_list=$(cat server_version.txt | sort -r | awk '{print $1 " |"}')
 
 SELECTED_VERSION=$(whiptail --menu --fb "Select Your ECO server." 20 60 10 ${eco_server_list[@]} 3>&1 1>&2 2>&3)
@@ -243,35 +259,30 @@ if [ $RET -eq 1 ]; then
 exit 1
 elif [ $RET -eq 0 ]; then
 dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION")
+echo "Replace this"
 fi
 
 r=$(wget $dl_link -O $DIR/$SELECTED_DIR/$SELECTED_VERSION)
+
 if [ $? -ne 0 ]; then
 whiptail --msgbox --clear --fb "Download failed!, check your internet and the link.\
 The current link is: $dl_link" 20 60
 fi
 
 cd $DIR/$SELECTED_DIR
-#Grab avalible download versions from site (Linux Server only)
 unzip $SELECTED_VERSION
-rm $SELECTED_VERSION
+#rm $SELECTED_VERSION
 sed -i 's/ECO_VERSION=.*/ECO_VERSION='$SELECTED_VERSION'/g' $INSTALL_LOC/Files/conf.cfg
 sed -i 's/SELECTED_DIR=.*/SELECTED_DIR='$SELECTED_DIR'/g' $INSTALL_LOC/Files/conf.cfg
 #Make our own config per server.
 echo $SELECTED_DIR
 cp $INSTALL_LOC/Files/conf.cfg $DIR/$SELECTED_DIR/
-#cp $INSTALL_LOC/Files/watch.sh $DIR/$SELECTED_DIR/
-#sed -i 's:SELECTED_DIR=.*:SELECTED_DIR='$SELECTED_DIR':g' conf.cfg
-#sed -i 's/START="screen -dmS ECO/START="screen -dmS '${SELECTED_DIR}'/g' $DIR/$SELECTED_DIR/conf.cfg
-#sed -i 's/STOP="screen -X -S ECO/STOP="screen -X -S '${SELECTED_DIR}'/g' $DIR/$SELECTED_DIR/conf.cfg
-#sed -i 's/WATCH_START="screen -dmS WATCH/WATCH_START="screen -dmS '${SELECTED_DIR}_WATCH'/g' $DIR/$SELECTED_DIR/conf.cfg
-#sed -i 's/WATCH_STOP="screen -X -S WATCH/WATCH_STOP="screen -X -S '${SELECTED_DIR}_WATCH'/g' $DIR/$SELECTED_DIR/conf.cfg
-#sed -i 's:source.*:source '${DIR}'/'${SELECTED_DIR}'/conf.cfg:g' $DIR/$SELECTED_DIR/watch.sh
 
 source $DIR/$SELECTED_DIR/conf.cfg
 do_world_size
 do_start_config
 do_first_run
+do_stagetwo
 }
 
 do_upgrade() {
@@ -431,16 +442,24 @@ fi
 }
 
 do_newserver() {
-NEW=$(whiptail --fb --title "Creating a new server!" --inputbox "Please give your server a name." 10 60 ECO 3>&1 1>&2 2>&3)
+NEW=$(whiptail --fb --title "Creating a new server!" --inputbox "Please give your server a name." 10 60 3>&1 1>&2 2>&3)
 RET=$?
 if [ $RET -eq 1 ]; then
 echo "You choose to leave."
 exit 1
-elif [ $RET -eq 0 ]; then
+elif [ $RET -eq 0 ]; then 
+CURRENT=( $( ls /opt/ELSM/Server/ ) )
 NEW=${NEW// /_}
+echo $NEW
+if [[ " ${CURRENT[*]} " == *" ${NEW} "* ]]; then
+whiptail --msgbox --fb "This server name has already been used, Please select a different one!." 20 60 0
+unset NEW
+do_newserver
+else
     mkdir $DIR/"${NEW}"
     SELECTED_DIR="${NEW}"
     do_install
+fi
 fi
 }
 
@@ -451,7 +470,7 @@ if [ $RET -eq 1 ]; then
 exit 1
 elif [ $RET -eq 0 ]; then
 if [ $list == "0" ]; then
-source $INSTALL_LOC/Files/conf.cfg
+#source $INSTALL_LOC/Files/conf.cfg
 do_newserver
 else
 if [ $list -eq "1" ]; then
@@ -510,7 +529,7 @@ done
 
 do_ECO_upgrade_check() {
 cd $INSTALL_LOC/Files
-wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt
+#wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt
 UPGRADE_VERSIONS=$(cat server_version.txt | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
 UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' server_version.txt | sort -r | awk '{print $1 " |"}')
 
@@ -521,18 +540,37 @@ if [ ! $UPGRADE_VERSIONS = "1" ]; then
 fi
 }
 
+do_advanced_menu() {
+while true; do
+  FUN=$(whiptail --fb --title "Advanced menu" --menu "WARNING!!!"  --cancel-button Back --ok-button Select 20 80 7 \
+    "1 Force stop server." "[Force the server to stop!]" \
+    3>&1 1>&2 2>&3)
+  RET=$?
+  if [ $RET -eq 1 ]; then
+    do_menu
+  elif [ $RET -eq 0 ]; then
+    case "$FUN" in
+      1\ *) do_force_kill ;;
+      *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+    esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+fi
+done
+}
+
 do_menu() {
 do_startup
 while true; do
-  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
+  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 10 \
     "1 Start" "[Attempts to start the server]" \
     "2 Stop" "[Attempt to stop the server]" \
     "3 Restart" "[Restart the server]" \
     "4 Configs" "[Allows you to make changes to config files]" \
-    "5 Upgrade/Fallback" "[Upgrade ECO or fallback after failed upgrade.]" \
-    "6 Server Reset menu" "[Map wipes or complete server wipes!]" \
-    "7 Multi Server menu" "[Create More servers!]" \
-    "8 Info" "[Fast information about the server.]" \
+    "5 Server Select" "[Need to manage another server?]" \
+    "6 Upgrade/Fallback" "[Upgrade ECO or fallback after failed upgrade.]" \
+    "7 Server Reset menu" "[Map wipes or complete server wipes!]" \
+    "8 Multi Server menu" "[Create More servers!]" \
+    "9 Advanced Menu" "[Sometimes you might need more tools...]" \
+    "10 Info" "[Fast information about the server.]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -543,10 +581,12 @@ RET=$?
       2\ *) do_stop ;;
       3\ *) do_restart ;;
       4\ *) do_start_config ;;
-      5\ *) do_upgrade ;;
-      6\ *) do_reset_menu ;;
-      7\ *) do_newserver ;;
-      8\ *) do_info ;;
+      5\ *) do_multi_check ;;
+      6\ *) do_upgrade ;;
+      7\ *) do_reset_menu ;;
+      8\ *) do_newserver ;;
+      9\ *) do_advanced_menu ;;
+      10\ *) do_info ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
