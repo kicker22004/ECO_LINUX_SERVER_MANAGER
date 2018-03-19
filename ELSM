@@ -138,8 +138,8 @@ easy-config_serverPassword() {
       jq ".Password = \"${Password}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
     else
       echo "Password is empty."
-      easy-config_serverPassword()
-      return 0
+      easy-config_serverPassword
+      return
     fi
   else
     #Exit
@@ -177,8 +177,6 @@ easy-config_serverType() {
   fi
 }
 do_start_easy_config() {
-  #Set the size of the world
-  do_world_size
   SEL="Network"
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   #Set the server's port
@@ -190,10 +188,12 @@ do_start_easy_config() {
     exitstatus=$?
     if [ $exitstatus = 0 ]; then
     #Check if the user entered int
-      if [[ $Gport =~ '^[0-9]+$' || $Wport =~ '^[0-9]+$' ]]; then
+      if [[ $Gport =~ ^[0-9]+$ || $Wport =~ ^[0-9]+$ ]]; then
        # Check if ports is already taken
-        if [ -z netstat -an |grep $Gport |grep LISTEN ]; then
-          if [ -z netstat -an |grep $Wport |grep LISTEN ]; then
+       port1=$(netstat -an | grep $Gport | grep LISTEN)
+       port2=$(netstat -an | grep $Wport | grep LISTEN)
+        if [[ ! -z  port1 ]]; then
+          if [[ ! -z port2 ]]; then
             #Set the ports in config file
             jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
@@ -202,18 +202,25 @@ do_start_easy_config() {
             whiptail --title "Server Config" --msgbox "Server creation finished !" 10 60
           else
             echo "Port already taken"
+            echo "Var: \"${port1}\""
+            netstat -an | grep $Gport | grep LISTEN
+            sleep 5
             do_start_easy_config
-            return 0
+            return
           fi
         else
           echo "Port already taken"
+          echo "Var: \"${port1}\""
+          netstat -an | grep $Gport | grep LISTEN
+          sleep 5
           do_start_easy_config
-          return 0
+          return
         fi
       else
         echo "Not a number"
+        sleep 5
         do_start_easy_config
-        return 0
+        return
       fi
     else
       #Exit
@@ -685,7 +692,7 @@ do_config_menu() {
   RET=$?
   if [ $RET -eq 1]; then
     do_menu
-    return 0
+    return
   elif [ $RET -eq 0]; then
     case "$Choice" in
     esac
