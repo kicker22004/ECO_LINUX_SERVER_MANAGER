@@ -602,15 +602,14 @@ done
 }
 
 do_info(){
-if screen -list | grep -q "ECO"; then
+if screen -list | grep -q "$SELECTED_DIR"; then
 STATUS="ONLINE"
 else
 STATUS="OFFLINE"
 fi
 on_now=$(ss -t | grep -o "$PORT" | wc -l)
 #Calculate accurate CPU usage.
-cpufree=$(mpstat 1 1 | tail -n 1 | awk '{printf $12}')
-CPU=$(echo "scale=1; x=100-$cpufree; if(x<1) print 0; x" | bc)
+CPU=`top -b -n1 | grep "Cpu(s)" | awk '{print $2 + $4}'`
 #Gather Internal and External IP
 EXTERNAL_IP=$(/usr/bin/curl -s http://mdrjr.net/ip.php)
 INTERNAL_IP=$(hostname -I | awk '{print $1}')
