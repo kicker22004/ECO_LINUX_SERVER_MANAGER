@@ -4,8 +4,10 @@ green='\e[1;32m'
 red='\e[0;31m'
 yellow='\e[1;33m'
 NC='\033[0m'
-#Auto install script
 
+#Auto install script
+#Get script dir
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 #Check for sudo
 if [ $UID != 0 ]; then
 # not root, use sudo
@@ -33,14 +35,14 @@ echo -e ${green}"Eco user successfully created."${NC}
 
 #Download ELSM
 echo -e ${yellow}"Downloading ELSM..."${NC}
-git clone https://github.com/kicker22004/ECO_LINUX_SERVER_MANAGER.git ./elsm
+git clone https://github.com/kicker22004/ECO_LINUX_SERVER_MANAGER.git /tmp/elsm
 chown -R eco:eco /tmp/elsm
-chmod -R +x /tmp/elsm
-cd /tmp/elsm
 echo -e ${green}"ELSM successfully downloaded."${NC}
 
 echo -e ${yellow}"Start ELSM Installer..."${NC}
-su eco -c "cd /tmp/elsm; ./Install.sh"
+cd /tmp/elsm
+./Install.sh
 echo -e ${green}"ELSM successfully installed."${NC}
 echo -e ${yellow}"Cleaning up..."${NC}
 rm -rf /tmp/elsm
+rm -f $DIR/easy-install.sh
