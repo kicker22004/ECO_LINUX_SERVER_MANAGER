@@ -1,6 +1,10 @@
 # ECO_LINUX_SERVER_MANAGER
 This is an easy to use set of scripts to host an ECO server on linux.
+## For new users
+You only had to run this command:
+`wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/easy-install.sh; chmod +x ./easy-install.sh; ./easy-install.sh`
 
+## For advanced users
 YOU NEVER WANT TO RUN THIS AS ROOT USER... IT WILL BREAK 100% OF THE TIME.
 
 So lets make a user using root.
