@@ -216,7 +216,6 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy-config_serverDesc
             do_easy-config_serverType
-	    #WorldTickCPUMax - Verify please
 	    do_easy-config_worldtickcpumax
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
