@@ -28,12 +28,12 @@ if hash apt-get 2>/dev/null; then
   ##Detect OS
   DISTRO=$(lsb_release --id | awk '{print tolower($3)}')
   CODENAME=$(lsb_release --codename | awk '{print $2}')
-  apt-get -y update
-  apt-get -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano
-  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+  apt-get -y update > /dev/null
+  apt-get -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano > /dev/null
+  apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF > /dev/null
   echo "deb http://download.mono-project.com/repo/$DISTRO beta-$CODENAME main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
-  apt-get -y update
-  apt-get -y --allow-unauthenticated install mono-devel   
+  apt-get -y update > /dev/null
+  apt-get -y --allow-unauthenticated install mono-devel > /dev/null
 else
   yum -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano
   rpm --import "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
