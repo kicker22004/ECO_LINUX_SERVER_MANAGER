@@ -125,7 +125,7 @@ fi
 do_easy-config_worldtickcpumax() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
-  #Set WorldTickCPUMax
+  #Set WorldTickCPUMax WORKING
   sed -i "5 d" "$CONFIGS/$SEL.eco" #Remove lines that we are editing
   sed -i "6 d" "$CONFIGS/$SEL.eco" #Same as above
   sed -i '5s/^/ },\n/' "$CONFIGS/$SEL.eco" #Add neccesary }, to the file
