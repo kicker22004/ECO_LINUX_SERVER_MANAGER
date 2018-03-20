@@ -217,7 +217,7 @@ do_start_easy_config() {
             do_easy-config_serverDesc
             do_easy-config_serverType
 	    #WorldTickCPUMax - Verify please
-	    #do_easy-config_worldtickcpumax
+	    do_easy-config_worldtickcpumax
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
