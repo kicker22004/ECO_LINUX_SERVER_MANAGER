@@ -1,15 +1,11 @@
 #!/bin/bash
-
 #Add color for info.
 green='\e[1;32m'
 red='\e[0;31m'
 yellow='\e[1;33m'
-
 #source /opt/ELSM/Files/conf.cfg
 SELECTED_DIR=$2
 DIR="/opt/ELSM/Server"
-
-
 do_startup() {
 ##Simple check to make sure there is actually a server built##
 ##############################################################
@@ -78,7 +74,7 @@ fi
 
 
 ### List options that we want in simple edit.
-do_start_config() {
+do_start_advanced_config() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 ##Get the lists!
 unset FALLBACK SEL LIST
@@ -90,7 +86,6 @@ if [ $RET -eq 0 ]; then
 do_main_config
 fi
 }
-
 do_world_size() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="WorldGenerator"
@@ -99,6 +94,7 @@ WG_SIZE=$(whiptail --fb --title "World Size" --radiolist "Choose: (Spacebar to s
   "1X (Default)" "[100x100 World]" on \
   "2X" "[140x140 World]" off \
   "4X" "[200x200 World]" off \
+  "Custom" "[Choose your world's size]"
   3>&1 1>&2 2>&3)
 if [ "$WG_SIZE" = "Little_Big_Planet" ]; then
 jq '.Dimensions.x = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
@@ -116,8 +112,142 @@ if [ "$WG_SIZE" = "4X" ]; then
 jq '.Dimensions.x = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
+if ["$WG_SIZE" = "Custom" ]; then
+size=$(whiptail --title "World Size" --inputbox "Enter the world's size:" 10 60 "100" 3>&1 1>&2 2>&3)
+jq ".Dimensions.x = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq ".Dimensions.y = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
 }
+#Functions used for easy config
+easy-config_serverDesc() {
+  CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+  SEL="Network"
+  #Ask for server desc
+  ServerName=$(whiptail --title "Server Name" --inputbox "Enter the server's description" 10 60 "Eco_LinuxServer" 3>&1 1>&2 2>&3)
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+    jq ".Description = \"${ServerName}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 
+  else
+    #Exit
+    echo "Exited"
+    exit 1
+  fi
+}
+easy-config_serverPassword() {
+  CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+  SEL="Network"
+  Password=$(whiptail --title "Server Password" --inputbox "Enter server password.\n Warning: EVERYONE having this password can access this server." 10 60 "very-secure-passw0rd" 3>&1 1>&2 2>&3)
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+    if ! [ -z $Password ]; then
+      jq ".Password = \"${Password}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+    else
+      echo "Password is empty."
+      easy-config_serverPassword
+      return
+    fi
+  else
+    #Exit
+    echo "Exited"
+    exit 1
+  fi
+}
+easy-config_serverType() {
+  CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+  SEL="Network"
+  #Ask for server type
+  Type=$(whiptail --title "Server type (Spacebar to choose, enter to confirm)" --radiolist \
+  "Choose your server auth type" 15 60 4 \
+  "Public" "Everyone can join your server" ON \
+  "Private" "Only whitelisted user can join the server" OFF \
+  "Private with password" "Only users with password can join your server" OFF 3>&1 1>&2 2>&3)
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+      case $Type in
+        "Public")
+          jq '.PublicServer = true' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+        ;;
+        "Private")
+          jq '.PublicServer = false' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+        ;;
+        "Private with password")
+          jq '.PublicServer = false' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+          easy-config_serverPassword
+        ;;
+      esac  
+  else
+    #Exit
+      echo "Exited"
+      exit 1
+  fi
+}
+do_start_easy_config() {
+  SEL="Network"
+  CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+  #Set the server's port
+  Gport=$(whiptail --title "Server Ports" --inputbox "Enter the server's port (For the game)" 10 60 "3000" 3>&1 1>&2 2>&3)
+  exitstatus=$?
+  if [ $exitstatus = 0 ]; then
+    #Ask for the web port
+    Wport=$(whiptail --title "Server Ports" --inputbox "Enter the web server's port (Must be different)" 10 60 "3001" 3>&1 1>&2 2>&3)
+    exitstatus=$?
+    if [ $exitstatus = 0 ]; then
+    #Check if the user entered int
+      if [[ $Gport =~ ^[0-9]+$ || $Wport =~ ^[0-9]+$ ]]; then
+       # Check if ports is already taken
+       port1=$(netstat -an | grep $Gport | grep LISTEN)
+       port2=$(netstat -an | grep $Wport | grep LISTEN)
+        if [[ ! -z  port1 ]]; then
+          if [[ ! -z port2 ]]; then
+            #Set the ports in config file
+            jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+            jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+            easy-config_serverDesc
+            easy-config_serverType
+            whiptail --title "Server Config" --msgbox "Server creation finished !" 10 60
+          else
+            echo "Port already taken"
+            echo "Var: \"${port1}\""
+            netstat -an | grep $Gport | grep LISTEN
+            sleep 5
+            do_start_easy_config
+            return
+          fi
+        else
+          echo "Port already taken"
+          echo "Var: \"${port1}\""
+          netstat -an | grep $Gport | grep LISTEN
+          sleep 5
+          do_start_easy_config
+          return
+        fi
+      else
+        echo "Not a number"
+        sleep 5
+        do_start_easy_config
+        return
+      fi
+    else
+      #Exit
+      echo "Exited"
+      exit 1
+    fi
+  else
+    #Exit
+    echo "Exited"
+    exit 1
+  fi
+  
+}
+do_start_config() {
+  #We start with the server name
+  if (whiptail --title "Server install" --yesno "There are two types of installation: \n Easy: for new users, you will need any skill for this \n Advanced: Edit yourself the config files"  --yes-button "Basic" --no-button "Advanced" 10 60) then
+    do_start_easy_config
+  else
+    do_start_advanced_config
+  fi
+}
 do_main_config() {
 nano $CONFIGS/$SEL.eco
 $FALLBACK
@@ -560,7 +690,70 @@ while true; do
 fi
 done
 }
-
+do_config_menu() {
+  Choice=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 11 \
+    "Simple" "[For new user, a simple tool]" \
+    "Advanced" "[For advanced users, a menu for editing config directly]"
+  3>&1 1>&2 2>&3)
+  RET=$?
+  if [ $RET -eq 1]; then
+    do_menu
+    return
+  elif [ $RET -eq 0]; then
+    case "$Choice" in
+    esac
+  else
+    echo $RET
+    exit 1
+  fi
+}
+do_easy_config_menu() {
+  while true; do
+    FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 11 \
+      "1 Server Name" "[Change the description]" \
+      "2 Change access permission" "[Public / Private]" \
+      "3 Return" "" \
+    3>&1 1>&2 2>&3)
+    RET=$?
+    if [ $RET -eq 1 ]; then
+      do_config_choice_menu
+      return
+    elif [ $RET -eq 0 ]; then
+      case "$FUN" in
+        1\ *) easy-config_serverDesc ;;
+        2\ *) easy-config_serverType ;;
+        3\ *) 
+        return
+        ;;
+  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
+      esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
+    else
+      exit 1
+    fi
+  done
+}
+do_config_choice_menu() {
+  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Choose edition of config editor"  --cancel-button Exit --ok-button "Select" 20 80 11 \
+    "Simple" "[For new users]" \
+    "Advanced" "[For who wants to edit files]" \
+  3>&1 1>&2 2>&3)
+  RET=$?
+  if [ $RET -eq 1 ]; then
+    do_menu
+    return
+  elif [ $RET -eq 0 ]; then
+    case "$FUN" in
+      "Simple")
+        do_easy_config_menu
+      ;;
+      "Advanced")
+        do_start_advanced_config
+      ;;
+    esac
+  else
+    exit 1
+  fi
+}
 do_menu() {
 do_startup
 while true; do
@@ -585,7 +778,7 @@ RET=$?
       1\ *) do_start ;;
       2\ *) do_stop ;;
       3\ *) do_restart ;;
-      4\ *) do_start_config ;;
+      4\ *) do_config_choice_menu ;;
       5\ *) do_multi_check ;;
       6\ *) do_upgrade ;;
       7\ *) do_reset_menu ;;
