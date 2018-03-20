@@ -126,10 +126,10 @@ do_easy-config_worldtickcpumax() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
   #Set WorldTickCPUMax
-  sed -i "5 d" " $CONFIGS/$SEL.eco" #Remove lines that we are editing
-  sed -i "6 d" " $CONFIGS/$SEL.eco" #Same as above
-  sed -i '5s/^/ },\n/' " $CONFIGS/$SEL.eco" #Add neccesary }, to the file
-  sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' " $CONFIGS/$SEL.eco" #Add WorldTickCPUMax Option and new line the bracket
+  sed -i "5 d" "$CONFIGS/$SEL.eco" #Remove lines that we are editing
+  sed -i "6 d" "$CONFIGS/$SEL.eco" #Same as above
+  sed -i '5s/^/ },\n/' "$CONFIGS/$SEL.eco" #Add neccesary }, to the file
+  sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/$SEL.eco" #Add WorldTickCPUMax Option and new line the bracket
 }
 do_easy-config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
