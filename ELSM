@@ -141,7 +141,6 @@ WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Choices: (Sp
   "Low Usage" "[0.2]" off \
   "Medium Usage(Default)" "[0.4]" on \
   "High Usage" "[0.6]" off \
-  "Custom" "[Choose your own]" off \
   3>&1 1>&2 2>&3)
 if [ "$WT_CPUMAX" = "Low Usage" ]; then
 jq '.WorldTickCPUMax = "0.2"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
@@ -151,10 +150,6 @@ jq '.WorldTickCPUMax = "0.4"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$WT_CPUMAX" = "High Usage" ]; then
 jq '.WorldTickCPUMax = "0.6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-fi
-if [ "$WT_CPUMAX" = "Custom" ]; then
-customcpumax=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 10 60 "0.44" 3>&1 1>&2 2>&3)
-jq ".WorldTickCPUMax = \"${customcpumax}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 }
 do_easy_config_serverDesc() {
