@@ -3,9 +3,10 @@
 green='\e[1;32m'
 red='\e[0;31m'
 yellow='\e[1;33m'
-#source /opt/ELSM/Files/conf.cfg
 SELECTED_DIR=$2
 DIR="/opt/ELSM/Server"
+
+
 do_startup() {
 ##Simple check to make sure there is actually a server built##
 ##############################################################
@@ -53,7 +54,7 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
     $WATCH_STOP
     screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
   else
-     echo "No server was found to be running...did you start on?"
+     echo "No server was found to be running...did you start one?"
   fi
 }
 
@@ -75,10 +76,9 @@ fi
 
 ### List options that we want in simple edit.
 do_start_advanced_config() {
+unset CONFIGS LIST SEL 
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 ##Get the lists!
-unset FALLBACK SEL LIST
-FALLBACK="do_start_config"
 LIST=$(ls $DIR/$SELECTED_DIR/Configs/ | awk -F. '{print $1" |"}')
 SEL=$(whiptail --menu --fb "Configs Menu" --ok-button Enter --cancel-button Back 20 60 10 ${LIST[@]} 3>&1 1>&2 2>&3)
 RET=$?
@@ -86,7 +86,9 @@ if [ $RET -eq 0 ]; then
 do_main_config
 fi
 }
+
 do_world_size() {
+echo "You made it to world size"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="WorldGenerator"
 WG_SIZE=$(whiptail --fb --title "World Size" --radiolist "Choose: (Spacebar to select!)" 20 60 10\
@@ -94,7 +96,7 @@ WG_SIZE=$(whiptail --fb --title "World Size" --radiolist "Choose: (Spacebar to s
   "1X (Default)" "[100x100 World]" on \
   "2X" "[140x140 World]" off \
   "4X" "[200x200 World]" off \
-  "Custom" "[Choose your world's size]"
+  "Custom" "[Choose your world's size]" off \
   3>&1 1>&2 2>&3)
 if [ "$WG_SIZE" = "Little_Big_Planet" ]; then
 jq '.Dimensions.x = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
@@ -112,56 +114,67 @@ if [ "$WG_SIZE" = "4X" ]; then
 jq '.Dimensions.x = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq '.Dimensions.y = "200"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if ["$WG_SIZE" = "Custom" ]; then
-size=$(whiptail --title "World Size" --inputbox "Enter the world's size:" 10 60 "100" 3>&1 1>&2 2>&3)
+if [ "$WG_SIZE" = "Custom" ]; then
+size=$(whiptail --fb --title "World Size" --inputbox "Enter the world's size:" 10 60 "100" 3>&1 1>&2 2>&3)
 jq ".Dimensions.x = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq ".Dimensions.y = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 }
+
 #Functions used for easy config
-easy-config_serverDesc() {
+do_easy_config_worldtickcpumax() {
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="World"
+  #Set WorldTickCPUMax WORKING
+  sed -i "5 d" "$CONFIGS/$SEL.eco" #Remove lines that we are editing
+  sed -i "6 d" "$CONFIGS/$SEL.eco" #Same as above
+  sed -i '5s/^/ },\n/' "$CONFIGS/$SEL.eco" #Add neccesary }, to the file
+  sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/$SEL.eco" #Add WorldTickCPUMax Option and new line the bracket
+}
+
+do_easy_config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
   #Ask for server desc
-  ServerName=$(whiptail --title "Server Name" --inputbox "Enter the server's description" 10 60 "Eco_LinuxServer" 3>&1 1>&2 2>&3)
+  ServerName=$(whiptail --fb --title "Server Name" --inputbox "Enter the server's description" 10 60 "Eco_LinuxServer" 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     jq ".Description = \"${ServerName}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 
   else
-    #Exit
     echo "Exited"
     exit 1
   fi
 }
-easy-config_serverPassword() {
+
+do_easy_config_serverPassword() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
-  Password=$(whiptail --title "Server Password" --inputbox "Enter server password.\n Warning: EVERYONE having this password can access this server." 10 60 "very-secure-passw0rd" 3>&1 1>&2 2>&3)
+  Password=$(whiptail --fb --title "Server Password" --inputbox "Enter server password.\n Warning: EVERYONE having this password can access this server." 10 60 "very-secure-passw0rd" 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     if ! [ -z $Password ]; then
       jq ".Password = \"${Password}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
     else
       echo "Password is empty."
-      easy-config_serverPassword
+      do_easy_config_serverPassword
       return
     fi
   else
-    #Exit
     echo "Exited"
     exit 1
   fi
 }
-easy-config_serverType() {
+
+do_easy_config_serverType() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
   #Ask for server type
-  Type=$(whiptail --title "Server type (Spacebar to choose, enter to confirm)" --radiolist \
-  "Choose your server auth type" 15 60 4 \
+  Type=$(whiptail --fb --title "Server type (Spacebar to choose, enter to confirm)" --radiolist \
+  "Choose your server auth type" 15 90 4 \
   "Public" "Everyone can join your server" ON \
-  "Private" "Only whitelisted user can join the server" OFF \
-  "Private with password" "Only users with password can join your server" OFF 3>&1 1>&2 2>&3)
+  "Private" "Only whitelisted users can join the server" OFF \
+  "Private with password" "Only users with the password can join your server" OFF 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
       case $Type in
@@ -173,7 +186,7 @@ easy-config_serverType() {
         ;;
         "Private with password")
           jq '.PublicServer = false' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-          easy-config_serverPassword
+          do_easy_config_serverPassword
         ;;
       esac  
   else
@@ -186,11 +199,11 @@ do_start_easy_config() {
   SEL="Network"
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   #Set the server's port
-  Gport=$(whiptail --title "Server Ports" --inputbox "Enter the server's port (For the game)" 10 60 "3000" 3>&1 1>&2 2>&3)
+  Gport=$(whiptail --fb --title "Server Ports" --inputbox "Enter the server's port (For the game)" 10 60 "3000" 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     #Ask for the web port
-    Wport=$(whiptail --title "Server Ports" --inputbox "Enter the web server's port (Must be different)" 10 60 "3001" 3>&1 1>&2 2>&3)
+    Wport=$(whiptail --fb --title "Server Ports" --inputbox "Enter the web server's port (Must be different)" 10 60 "3001" 3>&1 1>&2 2>&3)
     exitstatus=$?
     if [ $exitstatus = 0 ]; then
     #Check if the user entered int
@@ -203,9 +216,10 @@ do_start_easy_config() {
             #Set the ports in config file
             jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-            easy-config_serverDesc
-            easy-config_serverType
-            whiptail --title "Server Config" --msgbox "Server creation finished !" 10 60
+            do_easy_config_serverDesc
+            do_easy_config_serverType
+	    do_easy_config_worldtickcpumax
+            whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
             echo "Var: \"${port1}\""
@@ -229,12 +243,10 @@ do_start_easy_config() {
         return
       fi
     else
-      #Exit
       echo "Exited"
       exit 1
     fi
   else
-    #Exit
     echo "Exited"
     exit 1
   fi
@@ -242,7 +254,7 @@ do_start_easy_config() {
 }
 do_start_config() {
   #We start with the server name
-  if (whiptail --title "Server install" --yesno "There are two types of installation: \n Easy: for new users, you will need any skill for this \n Advanced: Edit yourself the config files"  --yes-button "Basic" --no-button "Advanced" 10 60) then
+  if (whiptail --fb --title "Server install" --yesno "There are two types of installation: \n Easy: for new users, Simple to setup and manage. \n Advanced: Master your World!"  --yes-button "Basic" --no-button "Advanced" 10 60) then
     do_start_easy_config
   else
     do_start_advanced_config
@@ -250,7 +262,7 @@ do_start_config() {
 }
 do_main_config() {
 nano $CONFIGS/$SEL.eco
-$FALLBACK
+do_start_advanced_config
 }
 
 do_first_run() {
@@ -282,7 +294,7 @@ do_stagetwo() {
 	clear
 	screen -S $SELECTED_DIR -p 0 -X stuff "exit $(printf \\r)"
 	screen -r $SELECTED_DIR 
-read -p "Did the server build correctly? YES/NO" -n 1 -r 
+read -p "Did the server build correctly? Y/N " -n 1 -r 
 echo # (optional) move to a new line 
 if [[ $REPLY =~ ^[Yy]$ ]] 
 then
@@ -378,7 +390,7 @@ INSTALL_LOC="/opt/ELSM"
 DIR="${INSTALL_LOC}/Server"
 ###Grab a list and see what we can do with it##
 cd $INSTALL_LOC/Files
-#GETLIST=$(wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt)
+GETLIST=$(wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt)
 GETLIST="${INSTALL_LOC}/Files/server_version.txt"
 eco_server_list=$(cat server_version.txt | sort -r | awk '{print $1 " |"}')
 
@@ -388,7 +400,6 @@ if [ $RET -eq 1 ]; then
 exit 1
 elif [ $RET -eq 0 ]; then
 dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION")
-echo "Replace this"
 fi
 
 r=$(wget $dl_link -O $DIR/$SELECTED_DIR/$SELECTED_VERSION)
@@ -400,7 +411,7 @@ fi
 
 cd $DIR/$SELECTED_DIR
 unzip $SELECTED_VERSION
-#rm $SELECTED_VERSION
+rm $SELECTED_VERSION
 sed -i 's/ECO_VERSION=.*/ECO_VERSION='$SELECTED_VERSION'/g' $INSTALL_LOC/Files/conf.cfg
 sed -i 's/SELECTED_DIR=.*/SELECTED_DIR='$SELECTED_DIR'/g' $INSTALL_LOC/Files/conf.cfg
 #Make our own config per server.
@@ -658,7 +669,7 @@ done
 
 do_ECO_upgrade_check() {
 cd $INSTALL_LOC/Files
-#wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt
+wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt
 UPGRADE_VERSIONS=$(cat server_version.txt | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
 UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' server_version.txt | sort -r | awk '{print $1 " |"}')
 
@@ -667,6 +678,15 @@ if [ ! $UPGRADE_VERSIONS = "1" ]; then
     		do_upgrade
 	fi
 fi
+}
+
+do_thankyou() {
+#Let's get the latest list and make sure it's always up to date!.
+#This is a fast addition so will probably clean it up and make it cleaner later. But it's important to get it live. Thank you guys!
+cd $INSTALL_LOC/Files
+wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/Thankyou.sh -O Thankyou.sh
+chmod +x Thankyou.sh
+./Thankyou.sh
 }
 
 do_patreon() {
@@ -690,6 +710,7 @@ while true; do
 fi
 done
 }
+
 do_config_menu() {
   Choice=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 11 \
     "Simple" "[For new user, a simple tool]" \
@@ -720,9 +741,9 @@ do_easy_config_menu() {
       return
     elif [ $RET -eq 0 ]; then
       case "$FUN" in
-        1\ *) easy-config_serverDesc ;;
-        2\ *) easy-config_serverType ;;
-        3\ *) 
+        1\ *) do_easy_config_serverDesc ;;
+        2\ *) do_easy_config_serverType ;;
+        3\ *)
         return
         ;;
   *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
@@ -732,10 +753,11 @@ do_easy_config_menu() {
     fi
   done
 }
+
 do_config_choice_menu() {
   FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Choose edition of config editor"  --cancel-button Exit --ok-button "Select" 20 80 11 \
     "Simple" "[For new users]" \
-    "Advanced" "[For who wants to edit files]" \
+    "Advanced" "[For those that know what they are doing!]" \
   3>&1 1>&2 2>&3)
   RET=$?
   if [ $RET -eq 1 ]; then
@@ -754,10 +776,11 @@ do_config_choice_menu() {
     exit 1
   fi
 }
+
 do_menu() {
 do_startup
 while true; do
-  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 11 \
+  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 12 \
     "1 Start" "[Attempts to start the server]" \
     "2 Stop" "[Attempt to stop the server]" \
     "3 Restart" "[Restart the server]" \
@@ -768,7 +791,8 @@ while true; do
     "8 Multi Server menu" "[Create More servers!]" \
     "9 Advanced Menu" "[Sometimes you might need more tools...]" \
     "10 Info" "[Fast information about the server.]" \
-    "11 Say Thanks!" "[Link to Patreon page, Thank you]" \
+    "11 Thank you" "[Backer/Donators/Contributors]" \
+    "12 Patreon Link" "[Link to Patreon page, Thank you]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -785,7 +809,8 @@ RET=$?
       8\ *) do_newserver ;;
       9\ *) do_advanced_menu ;;
       10\ *) do_info ;;
-      11\ *) do_patreon ;;
+      11\ *) do_thankyou ;;
+      12\ *) do_patreon ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
@@ -795,7 +820,7 @@ done
 }
 
 do_info(){
-if screen -list | grep -q "ECO"; then
+if screen -list | grep -q "${SELECTED_DIR}"; then
 STATUS="ONLINE"
 else
 STATUS="OFFLINE"
