@@ -156,6 +156,10 @@ if [ "$WT_CPUMAX" = "Custom" ]; then
 customcpu=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 10 60 "0.44" 3>&1 1>&2 2>&3)	
 jq ".WorldTickCPUMax = \"${customcpu}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
+if [ "$WT_CPUMAX" = "Custom" ]; then	
+customcpu=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 10 60 "0.44" 3>&1 1>&2 2>&3)	
+jq ".WorldTickCPUMax = \"${customcpu}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
 }
 do_easy_config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
