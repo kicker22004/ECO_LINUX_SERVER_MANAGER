@@ -40,11 +40,6 @@ else
   su -c 'curl https://download.mono-project.com/repo/centos7-preview.repo | tee /etc/yum.repos.d/mono-centos7-preview.repo'
   yum install mono-complete
 fi
-##Currently hardcoded for Mono Beta (5.8) on Ubuntu and Debian.
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-echo "deb http://download.mono-project.com/repo/$DISTRO beta-$CODENAME main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
-apt-get -y update
-apt-get -y --allow-unauthenticated install mono-devel
 }
 
 do_arm() {
@@ -128,7 +123,8 @@ If you agree Please, continue." 15 60) then
         sleep 5
         echo XXX
         echo 40
-        echo "Setting up for world distruction :)"
+        echo "Set parameters"
+        echo "$LAST_HASH" > $INSTALL_LOC/Files/updater_data.cfg
         echo XXX
         sleep 2
         echo XXX
