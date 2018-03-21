@@ -685,6 +685,7 @@ do_thankyou() {
 #This is a fast addition so will probably clean it up and make it cleaner later. But it's important to get it live. Thank you guys!
 cd $INSTALL_LOC/Files
 wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/Thankyou.sh -O Thankyou.sh
+chmod +x Thankyou.sh
 ./Thankyou.sh
 }
 
@@ -779,7 +780,7 @@ do_config_choice_menu() {
 do_menu() {
 do_startup
 while true; do
-  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 11 \
+  FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 12 \
     "1 Start" "[Attempts to start the server]" \
     "2 Stop" "[Attempt to stop the server]" \
     "3 Restart" "[Restart the server]" \
