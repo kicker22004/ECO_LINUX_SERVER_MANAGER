@@ -124,6 +124,7 @@ do_optimize() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
   #Optimize Function
+  #Still important to add WorldTickCPUMax to the World.eco file prior to setting the option for the user
   echo "Optimizing Server..."
   sed -i "5 d" "$CONFIGS/World.eco" #Remove lines that we are editing
   sed -i "6 d" "$CONFIGS/World.eco" #Same as above
@@ -133,22 +134,22 @@ SEL="World"
 }
 #Functions used for easy config
 do_easy_config_choose_wtcpumax() {
-echo "Choose a utilization Preset"
+echo "Choose an utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
 WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Choices: (Spacebar to select!)" 20 60 10\
-  "Low" "[0.2]" off \
-  "Medium (Default)" "[0.4]" on \
-  "High" "[0.6]" off \
+  "Low Usage" "[0.2]" off \
+  "Medium Usage(Default)" "[0.4]" on \
+  "High Usage" "[0.6]" off \
   "Custom" "[Choose your own]" off \
   3>&1 1>&2 2>&3)
-if [ "$WT_CPUMAX" = "Low" ]; then
+if [ "$WT_CPUMAX" = "Low Usage" ]; then
 jq '.WorldTickCPUMax = "0.2"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$WT_CPUMAX" = "Medium (Default)" ]; then
+if [ "$WT_CPUMAX" = "Medium Usage(Default)" ]; then
 jq '.WorldTickCPUMax = "0.4"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$WT_CPUMAX" = "High" ]; then
+if [ "$WT_CPUMAX" = "High Usage" ]; then
 jq '.WorldTickCPUMax = "0.6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$WT_CPUMAX" = "Custom" ]; then
