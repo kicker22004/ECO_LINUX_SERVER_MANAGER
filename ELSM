@@ -54,7 +54,7 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
     $WATCH_STOP
     screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
   else
-     echo "No server was found to be running...did you start on?"
+     echo "No server was found to be running...did you start one?"
   fi
 }
 
