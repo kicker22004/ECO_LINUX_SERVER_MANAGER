@@ -53,7 +53,7 @@ fi
 do_branch_choice
 #Download ELSM
 echo -e ${yellow}"Downloading ELSM..."${NC}
-git clone https://github.com/kicker22004/ECO_LINUX_SERVER_MANAGER.git /tmp/elsm
+git clone https://github.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER.git /tmp/elsm
 cd /tmp/elsm
 git checkout $BRANCH
 chown -R eco:eco /tmp/elsm
