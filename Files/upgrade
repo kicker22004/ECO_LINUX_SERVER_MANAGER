@@ -26,11 +26,11 @@ rm changelog
 
 do_update() {
 	cp $CONFIG $DIR/$SELECTED_DIR/conf.cfg.bak
-	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/ELSM -O ELSM
-	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/conf.cfg -O $DIR/$SELECTED_DIR/conf.cfg
-	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/conf.cfg -O $INSTALL_LOC/Files/conf.cfg
-	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/update.sh -O update.sh
-	wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/watch.sh -O watch.sh
+	wget https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/ELSM -O ELSM
+	wget https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/Files/conf.cfg -O $DIR/$SELECTED_DIR/conf.cfg
+	wget https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/Files/conf.cfg -O $INSTALL_LOC/Files/conf.cfg
+	wget https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/Files/update.sh -O update.sh
+	wget https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/Files/watch.sh -O watch.sh
 	clear
 	echo "Root is needed to install ELSM in (/usr/bin/)"
 	sudo mv ELSM /usr/bin/
@@ -44,6 +44,9 @@ do_update() {
 	sed -i "s/ECO_VERSION=.*/ECO_VERSION=$ECO_VERSION/g" $CONFIG
 	sed -i "s/check=.*/check=$check/g" $CONFIG
 	sed -i "s/startonboot=.*/startonboot=$startonboot/g" $CONFIG
+	#New upgrade system
+	sed -i "s/GIT_REPO_USER=.*/GIT_REPO_USER=$REPO_USER/g" $CONFIG
+	sed -i "s/DEFAULT_BRANCH=.*/DEFAULT_BRANCH=$DEFAULT_BRANCH/" $CONFIG
 }
 
 if [ -f $DIR/$SELECTED_DIR/conf.cfg ]; then

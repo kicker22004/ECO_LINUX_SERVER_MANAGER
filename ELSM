@@ -813,7 +813,7 @@ UPTIME=$(ps -o etime= -p $ELSM_PID)
 LOAD=$(uptime | grep -o "load average.*")
 RAM=$(free -mh | grep Mem | awk '{print $4}')
 RAM_TOTAL=$(free -mh | grep "Mem" | awk '{print $2}')
-TOTAL=$(du -sh $SELECTED_DIR | awk '{print $1}')
+TOTAL=$(du -sh $DIR/$SELECTED_DIR | awk '{print $1}')
 HDD_TOTAL=$(df -kh . | grep / | awk '{print $4}')
 MONO_VERSION=$(mono -V | grep version.* | cut -d " " -f 5)
 whiptail --fb --clear --title "Current server stats" --yesno --yes-button REFRESH --no-button Back \

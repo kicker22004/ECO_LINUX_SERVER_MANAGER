@@ -17,7 +17,7 @@ DIR="/opt/ELSM/Server"
 source $DIR/$SELECTED_DIR/conf.cfg
 LOCK=$SELECTED_DIR
         cd $INSTALL_LOC
-        wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/conf.cfg -O conf.cfg
+        wget -q https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/Files/conf.cfg -O conf.cfg
         source conf.cfg
         find=$(grep "ELSM_VERSION" conf.cfg > tmp)
         find=$(cat tmp | cut -d "=" -f2)
@@ -45,7 +45,7 @@ else
         $CLEAR
         sleep 2
         cd /opt/ELSM/Files/
-        wget -q https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/upgrade -O upgrade
+        wget -q https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/Files/upgrade -O upgrade
         chmod +x upgrade
         /opt/ELSM/Files/upgrade "${LOCK[@]}"
         echo -e ${green}"You are up to date."

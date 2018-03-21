@@ -100,7 +100,6 @@ else
 fi
 }
 
-
 if [ ! -d "$INSTALL_LOC" ]; then
         if (whiptail --fb --title "ELSM Installer" --yesno "Welcome to the ECO LINUX SERVER MANAGER. \
 This is the first time you have ran this so everything is going to need to be built and added to your system. \
