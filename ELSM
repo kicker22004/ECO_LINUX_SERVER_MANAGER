@@ -131,6 +131,7 @@ SEL="World"
   sed -i '5s/^/ },\n/' "$CONFIGS/$SEL.eco" #Add neccesary }, to the file
   sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/$SEL.eco" #Add WorldTickCPUMax Option and new line the bracket
 }
+
 do_easy_config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
@@ -145,6 +146,7 @@ do_easy_config_serverDesc() {
     exit 1
   fi
 }
+
 do_easy_config_serverPassword() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
@@ -678,6 +680,14 @@ if [ ! $UPGRADE_VERSIONS = "1" ]; then
 fi
 }
 
+do_thankyou() {
+#Let's get the latest list and make sure it's always up to date!.
+#This is a fast addition so will probably clean it up and make it cleaner later. But it's important to get it live. Thank you guys!
+cd $INSTALL_LOC/Files
+wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/Files/Thankyou.sh -O Thankyou.sh
+./Thankyou.sh
+}
+
 do_patreon() {
 whiptail --msgbox --fb "Thank you for at least looking at this link. I'll be adding a backer page if I ever get backers! https://www.patreon.com/kicker22004" 20 60 0
 
@@ -797,7 +807,8 @@ RET=$?
       8\ *) do_newserver ;;
       9\ *) do_advanced_menu ;;
       10\ *) do_info ;;
-      11\ *) do_patreon ;;
+      11\ *) do_thankyou ;;
+      12\ *) do_patreon ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
