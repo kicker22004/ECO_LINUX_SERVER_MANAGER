@@ -38,7 +38,7 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
      cd $INSTALL_LOC/Files/
      $WATCH_START "${SELECTED_DIR[@]}"
   else
-     echo "Server was found running... close it before running this"
+     echo "Server is already running... Please close it before running this."
   fi
   if ! screen -list | grep -q "WATCH"; then
      cd $INSTALL_LOC/Files/
@@ -54,7 +54,7 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
     $WATCH_STOP
     screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
   else
-     echo "No server was found to be running...did you start one?"
+     echo "No server was found to be running... Did you start one?"
   fi
 }
 
@@ -121,17 +121,19 @@ jq ".Dimensions.y = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 }
 
-#Functions used for easy config
-do_easy_config_worldtickcpumax() {
+do_optimize() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
-  #Set WorldTickCPUMax WORKING
-  sed -i "5 d" "$CONFIGS/$SEL.eco" #Remove lines that we are editing
-  sed -i "6 d" "$CONFIGS/$SEL.eco" #Same as above
-  sed -i '5s/^/ },\n/' "$CONFIGS/$SEL.eco" #Add neccesary }, to the file
-  sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/$SEL.eco" #Add WorldTickCPUMax Option and new line the bracket
+  #Optimize Function
+  echo "Optimizing Server..."
+  sed -i "5 d" "$CONFIGS/World.eco" #Remove lines that we are editing
+  sed -i "6 d" "$CONFIGS/World.eco" #Same as above
+  sed -i '5s/^/ },\n/' "$CONFIGS/World.eco" #Add neccesary }, to the file
+  sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/World.eco" #Add WorldTickCPUMax Option and new line the bracket
+  sed -i 's/60/300/g' "$CONFIGS/Storage.eco"
 }
 
+#Functions used for easy config
 do_easy_config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
@@ -218,7 +220,7 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-	    do_easy_config_worldtickcpumax
+	    do_optimize
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
@@ -379,7 +381,7 @@ $WATCH_STOP
 $STOP
 sleep 3
 if ! screen -list | grep -o "${MONITOR}"; then
-whiptail --msgbox --fb "Your server had been killed, Returning to the main menu." 20 60 0
+whiptail --msgbox --fb "Your server has been killed, Returning to the main menu." 20 60 0
 do_menu
 fi
 }
@@ -405,7 +407,7 @@ fi
 r=$(wget $dl_link -O $DIR/$SELECTED_DIR/$SELECTED_VERSION)
 
 if [ $? -ne 0 ]; then
-whiptail --msgbox --clear --fb "Download failed!, check your internet and the link.\
+whiptail --msgbox --clear --fb "Download failed!, check your internet connection and the link.\
 The current link is: $dl_link" 20 60
 fi
 
@@ -426,7 +428,7 @@ do_stagetwo
 }
 
 do_upgrade() {
-whiptail --msgbox --fb --title "404" "This menu is going to be disabled for right now, It's a bit to rushed and I would like to fine tune it more. Sorry guys i'll get to it soon." 20 60 0
+whiptail --msgbox --fb --title "404" "This menu is going to be disabled for now, It's a bit to rushed and I would like to fine tune it more. Sorry guys i'll get to it soon." 20 60 0
 }
 #if screen -list | grep -q "ECO"; then
 #    cd $DIR/$SELECTED_DIR
@@ -536,7 +538,7 @@ fi
 }
 
 do_map_reset() {
-whiptail --fb --yesno "This will reset your world and backups, A new world will be built...Continue?" 10 60 \
+whiptail --fb --yesno "This will reset your world and backups, A new world will be built... Continue?" 10 60 \
     --yes-button Yes --no-button No
   RET=$?
   if [ $RET -eq 0 ]; then
@@ -545,12 +547,12 @@ whiptail --fb --yesno "This will reset your world and backups, A new world will 
 	$STOP
 	rm -rf $DIR/$SELECTED_DIR/Storage/*
 	$WATCH_START
-	whiptail --msgbox --fb "Your server is now Generating the new world!, please give it time." 15 60
+	whiptail --msgbox --fb "Your server is now Generating a new world!, please give it time." 15 60
 fi
 }
 
 do_complete_wipe() {
-whiptail --fb --yesno "This will completely erase your server and configs...Continue?" 10 60 \
+whiptail --fb --yesno "This will completely erase your server and configs... Continue?" 10 60 \
     --yes-button Yes --no-button No
   RET=$?
   if [ $RET -eq 0 ]; then
@@ -559,7 +561,7 @@ whiptail --fb --yesno "This will completely erase your server and configs...Cont
        	$STOP
        	rm -rf $SELECTED_DIR/*
 	do_install
-        whiptail --msgbox --fb "Your server is now Generating the new world!, please give it time." 15 60
+        whiptail --msgbox --fb "Your server is now Generating a new world!, please give it time." 15 60
 fi
 }
 
