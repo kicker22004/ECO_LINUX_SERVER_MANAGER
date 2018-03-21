@@ -143,7 +143,7 @@ WT_METEOR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices:
   "60 Days" "Careless Mode" off \
   "90 Days" "Effortless Mode" off \
   "Off" "No Meteor" off \
-  "Custom" "Custom Setting" off \
+  "Custom" "Custom Days" off \
   3>&1 1>&2 2>&3)
 if [ "$WT_METEOR" = "15 Days" ]; then
 jq '.MeteorImpactDays = "15"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
