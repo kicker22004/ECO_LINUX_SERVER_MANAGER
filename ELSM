@@ -138,7 +138,7 @@ echo "Choose an utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Disasters"
 WT_METEOR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
-  "15 Days" "Difficulty Increase" off \
+  "15 Days" "Hard Mode" off \
   "30 Days" "DEFAULT" on \
   "60 Days" "Careless Mode" off \
   "90 Days" "Effortless Mode" off \
@@ -157,8 +157,8 @@ if [ "$WT_METEOR" = "90 Dayse" ]; then
 jq '.MeteorImpactDays = "90"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$WT_METEOR" = "Custom" ]; then	
-custommeteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 10 60 "0.44" 3>&1 1>&2 2>&3)	
-jq ".MeteorImpactDays = \"${custommeteor}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 10 60 "44" 3>&1 1>&2 2>&3)	
+jq ".MeteorImpactDays = \"${custom_meteor}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
 do_easy_config_choose_wtcpumax() {
