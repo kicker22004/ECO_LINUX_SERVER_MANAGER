@@ -791,7 +791,8 @@ while true; do
     "8 Multi Server menu" "[Create More servers!]" \
     "9 Advanced Menu" "[Sometimes you might need more tools...]" \
     "10 Info" "[Fast information about the server.]" \
-    "11 Say Thanks!" "[Link to Patreon page, Thank you]" \
+    "11 Thank you" "[Backer/Donators/Contributors]" \
+    "12 Patreon Link" "[Link to Patreon page, Thank you]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
