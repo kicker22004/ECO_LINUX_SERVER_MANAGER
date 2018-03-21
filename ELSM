@@ -220,7 +220,7 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-	    do_easy_config_optimize
+	    do_optimize
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
