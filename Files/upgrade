@@ -24,7 +24,6 @@ EOF
 whiptail --fb --title "ELSM Changelog 0.2.2" --textbox changelog 20 60
 rm changelog
 }
-
 do_update() {
 	cp $CONFIG $DIR/$SELECTED_DIR/conf.cfg.bak
 	wget https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/ELSM -O ELSM
