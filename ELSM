@@ -133,20 +133,52 @@ SEL="World"
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco"
 }
 #Functions used for easy config
+do_easy_config_meteorchoices() { #Test for new Function
+echo "Choose an utilization Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Disasters"
+WT_METEOR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
+  "15 Days" "Hard Mode" off \
+  "30 Days" "DEFAULT" on \
+  "60 Days" "Careless Mode" off \
+  "90 Days" "Effortless Mode" off \
+  "Off" "No Meteor" off \
+  "Custom" "Custom Days" off \
+  3>&1 1>&2 2>&3)
+if [ "$WT_METEOR" = "15 Days" ]; then
+jq '.MeteorImpactDays = "15"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_METEOR" = "30 Days" ]; then
+jq '.MeteorImpactDays = "30"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_METEOR" = "60 Days" ]; then
+jq '.MeteorImpactDays = "60"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_METEOR" = "90 Days" ]; then
+jq '.MeteorImpactDays = "90"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_METEOR" = "Off" ]; then
+jq '.CreateMeteor = "false"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_METEOR" = "Custom" ]; then	
+custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 10 60 "44" 3>&1 1>&2 2>&3)	
+jq ".MeteorImpactDays = \"${custom_meteor}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
+}
 do_easy_config_choose_wtcpumax() {
 echo "Choose an utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
-WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!) \n Leave on Medium if not sure." 20 60 10\
+WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
   "Low Usage" "Weak Servers" off \
-  "Medium Usage" "Most Servers" on \
+  "Medium Usage(Default)" "Most Servers" on \
   "High Usage" "Powerful Servers" off \
   "Custom" "Custom Setting" off \
   3>&1 1>&2 2>&3)
 if [ "$WT_CPUMAX" = "Low Usage" ]; then
 jq '.WorldTickCPUMax = "0.2"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$WT_CPUMAX" = "Medium Usage" ]; then
+if [ "$WT_CPUMAX" = "Medium Usage(Default)" ]; then
 jq '.WorldTickCPUMax = "0.42"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$WT_CPUMAX" = "High Usage" ]; then
@@ -243,6 +275,7 @@ do_start_easy_config() {
             do_easy_config_serverType
 	    do_optimize
 	    do_easy_config_choose_wtcpumax #adding for testing
+	    do_easy_config_meteorchoices #adding for testing
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
