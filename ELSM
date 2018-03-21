@@ -120,7 +120,6 @@ jq ".Dimensions.x = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq ".Dimensions.y = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 }
-
 do_optimize() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
@@ -132,8 +131,31 @@ SEL="World"
   sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/World.eco" #Add WorldTickCPUMax Option and new line the bracket
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco"
 }
-
 #Functions used for easy config
+do_easy_config_choose_wtcpumax() {
+echo "Choose a utilization Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="World"
+WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Choices: (Spacebar to select!)" 20 60 10\
+  "Low" "[0.2]" off \
+  "Medium (Default)" "[0.4]" on \
+  "High" "[0.6]" off \
+  "Custom" "[Choose your own]" off \
+  3>&1 1>&2 2>&3)
+if [ "$WT_CPUMAX" = "Low" ]; then
+jq '.WorldTickCPUMax = "0.2"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_CPUMAX" = "Medium (Default)" ]; then
+jq '.WorldTickCPUMax = "0.4"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_CPUMAX" = "High" ]; then
+jq '.WorldTickCPUMax = "0.6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_CPUMAX" = "Custom" ]; then
+customcpumax=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 10 60 "0.44" 3>&1 1>&2 2>&3)
+jq ".WorldTickCPUMax = \"${customcpumax}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+}
 do_easy_config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
@@ -148,7 +170,6 @@ do_easy_config_serverDesc() {
     exit 1
   fi
 }
-
 do_easy_config_serverPassword() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
@@ -167,7 +188,6 @@ do_easy_config_serverPassword() {
     exit 1
   fi
 }
-
 do_easy_config_serverType() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
