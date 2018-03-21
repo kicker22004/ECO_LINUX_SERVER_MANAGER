@@ -133,8 +133,32 @@ SEL="World"
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco"
 }
 #Functions used for easy config
+do_easy_config_backupfreq() { #Test for new Function
+echo "Choose an Backup Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Backup"
+W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
+  "2 Hours" "Often" off \
+  "4 Hours" "DEFAULT" on \
+  "6 Hours" "Delayed" off \
+  "Custom" "Custom" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_BACKUPFREQ" = "15 Days" ]; then
+jq '.BackupFrequencyInHours = "15"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "30 Days" ]; then
+jq '.BackupFrequencyInHours = "30"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "60 Days" ]; then
+jq '.BackupFrequencyInHours = "60"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "Custom" ]; then	
+custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 10 60 "2.5" 3>&1 1>&2 2>&3)	
+jq ".BackupFrequencyInHours = \"${custom_backup_freq}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
+}
 do_easy_config_meteorchoices() { #Test for new Function
-echo "Choose an utilization Preset"
+echo "Choose an Meteor Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Disasters"
 WT_METEOR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
