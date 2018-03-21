@@ -122,7 +122,7 @@ fi
 }
 
 #Functions used for easy config
-do_easy-config_worldtickcpumax() {
+do_easy_config_worldtickcpumax() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
   #Set WorldTickCPUMax WORKING
@@ -131,7 +131,7 @@ SEL="World"
   sed -i '5s/^/ },\n/' "$CONFIGS/$SEL.eco" #Add neccesary }, to the file
   sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/$SEL.eco" #Add WorldTickCPUMax Option and new line the bracket
 }
-do_easy-config_serverDesc() {
+do_easy_config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
   #Ask for server desc
@@ -145,7 +145,7 @@ do_easy-config_serverDesc() {
     exit 1
   fi
 }
-do_easy-config_serverPassword() {
+do_easy_config_serverPassword() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
   Password=$(whiptail --fb --title "Server Password" --inputbox "Enter server password.\n Warning: EVERYONE having this password can access this server." 10 60 "very-secure-passw0rd" 3>&1 1>&2 2>&3)
@@ -155,7 +155,7 @@ do_easy-config_serverPassword() {
       jq ".Password = \"${Password}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
     else
       echo "Password is empty."
-      do_easy-config_serverPassword
+      do_easy_config_serverPassword
       return
     fi
   else
@@ -164,7 +164,7 @@ do_easy-config_serverPassword() {
   fi
 }
 
-do_easy-config_serverType() {
+do_easy_config_serverType() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
   #Ask for server type
@@ -184,7 +184,7 @@ do_easy-config_serverType() {
         ;;
         "Private with password")
           jq '.PublicServer = false' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-          do_easy-config_serverPassword
+          do_easy_config_serverPassword
         ;;
       esac  
   else
@@ -214,9 +214,9 @@ do_start_easy_config() {
             #Set the ports in config file
             jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-            do_easy-config_serverDesc
-            do_easy-config_serverType
-	    do_easy-config_worldtickcpumax
+            do_easy_config_serverDesc
+            do_easy_config_serverType
+	    do_easy_config_worldtickcpumax
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
@@ -730,8 +730,8 @@ do_easy_config_menu() {
       return
     elif [ $RET -eq 0 ]; then
       case "$FUN" in
-        1\ *) do_easy-config_serverDesc ;;
-        2\ *) do_easy-config_serverType ;;
+        1\ *) do_easy_config_serverDesc ;;
+        2\ *) do_easy_config_serverType ;;
         3\ *)
         return
         ;;
