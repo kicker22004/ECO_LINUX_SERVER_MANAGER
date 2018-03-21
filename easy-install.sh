@@ -37,22 +37,30 @@ fi
 echo -e ${green}"Git successfully installed."${NC}
 
 #Create eco user
-echo -e ${yellow}"Create eco user..."${NC}
-echo -e ${yellow}"Enter eco's password"${NC}
-PASSWORD=$(mkpasswd -m sha-512)
-useradd -m -p ${PASSWORD} -s /bin/bash eco
-usermod -a -G sudo eco
-echo -e ${green}"Eco user successfully created."${NC}
+#Check if user is already created
+id -u eco
+if [ $? = 1 ]; then
+	echo -e ${yellow}"Create eco user..."${NC}
+	echo -e ${yellow}"Enter eco's password"${NC}
+	PASSWORD=$(mkpasswd -m sha-512)
+	useradd -m -p ${PASSWORD} -s /bin/bash eco
+	usermod -a -G sudo eco
+	echo -e ${green}"Eco user successfully created."${NC}
+else
+	echo -e ${red}"Eco user already created..."
+fi
 #Ask for branch
 do_branch_choice
 #Download ELSM
 echo -e ${yellow}"Downloading ELSM..."${NC}
 git clone https://github.com/kicker22004/ECO_LINUX_SERVER_MANAGER.git /tmp/elsm
+cd /tmp/elsm
+git checkout $BRANCH
 chown -R eco:eco /tmp/elsm
 echo -e ${green}"ELSM successfully downloaded."${NC}
 
 echo -e ${yellow}"Start ELSM Installer..."${NC}
-cd /tmp/elsm
+chmod +xX ./Install.sh
 ./Install.sh
 echo -e ${green}"ELSM successfully installed."${NC}
 echo -e ${yellow}"Cleaning up..."${NC}
