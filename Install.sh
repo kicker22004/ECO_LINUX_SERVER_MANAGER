@@ -24,16 +24,17 @@ fi
 do_deps() {
 ##Debian mini fix (Missing lsb_release to detect version for mono)
 if hash apt-get 2>/dev/null; then
-  apt-get -y install lsb-release
+  apt-get -qq install lsb-release
   ##Detect OS
   DISTRO=$(lsb_release --id | awk '{print tolower($3)}')
   CODENAME=$(lsb_release --codename | awk '{print $2}')
-  apt-get -y update > /dev/null
-  apt-get -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano > /dev/null
+  apt-get -qq update
+  apt-get -qq install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano > /dev/null
   apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
   echo "deb http://download.mono-project.com/repo/$DISTRO beta-$CODENAME main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
-  apt-get -y update > /dev/null
-  apt-get -y --allow-unauthenticated install mono-devel > /dev/null
+  apt-get -qq update
+  apt-get -qq --allow-unauthenticated install mono-devel
+  echo -e "Deps installed !"
 else
   yum -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano
   rpm --import "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
