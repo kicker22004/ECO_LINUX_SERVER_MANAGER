@@ -26,6 +26,10 @@ Change to Directory
 
 `cd ECO_LINUX_SERVER_MANAGER`
 
+Optional (For **really** advanced users), checkout to beta for lastest features.
+
+`git checkout Beta`
+
 And to launch do:
 
 `./Install.sh`

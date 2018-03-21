@@ -3,7 +3,6 @@
 ## Eco Linux Server Manager Installer##
 INSTALL_LOC=/opt/ELSM
 CPUINFO=`lscpu | grep "Architecture" | awk '{print $2}'`
-
 # Make sure we run with root privileges
 if [ $UID != 0 ]; then
 # not root, use sudo
@@ -99,6 +98,13 @@ But if your having issues you can start a clean install now." 20 60) then
 else
 	exit 0
 fi
+}
+do_config() {
+  #Add the branch in config.
+  BRANCH=$(git branch | grep \* | cut -d ' ' -f2-)
+  sed -i "s/DEFAULT_BRANCH=.*/DEFAULT_BRANCH=$BRANCH/" $INSTALL_LOC/Files/conf.cfg
+  LAST_HASH=$(git log --pretty=format:'%h' -n 1)
+  sed -i "s/ELSM_HASH=.*/ELSM_HASH=$BRANCH/" $INSTALL_LOC/Files/conf.cfg
 }
 
 if [ ! -d "$INSTALL_LOC" ]; then
