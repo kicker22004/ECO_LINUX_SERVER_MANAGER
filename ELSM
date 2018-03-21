@@ -241,6 +241,7 @@ do_start_easy_config() {
             do_easy_config_serverDesc
             do_easy_config_serverType
 	    do_optimize
+	    do_easy_config_choose_wtcpumax #adding for testing
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
