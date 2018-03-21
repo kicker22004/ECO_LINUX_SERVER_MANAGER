@@ -54,7 +54,7 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
     $WATCH_STOP
     screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
   else
-     echo "No server was found to be running...did you start on?"
+     echo "No server was found to be running...did you start one?"
   fi
 }
 
@@ -122,6 +122,15 @@ fi
 }
 
 #Functions used for easy config
+do_easy-config_worldtickcpumax() {
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="World"
+  #Set WorldTickCPUMax WORKING
+  sed -i "5 d" "$CONFIGS/$SEL.eco" #Remove lines that we are editing
+  sed -i "6 d" "$CONFIGS/$SEL.eco" #Same as above
+  sed -i '5s/^/ },\n/' "$CONFIGS/$SEL.eco" #Add neccesary }, to the file
+  sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/$SEL.eco" #Add WorldTickCPUMax Option and new line the bracket
+}
 do_easy-config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
@@ -207,6 +216,7 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy-config_serverDesc
             do_easy-config_serverType
+	    do_easy-config_worldtickcpumax
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
