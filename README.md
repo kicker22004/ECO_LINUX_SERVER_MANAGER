@@ -6,13 +6,13 @@ You only have to run this command:
 `wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/easy-install.sh; chmod +x ./easy-install.sh; ./easy-install.sh`
 
 ## For advanced users
-YOU NEVER WANT TO RUN THIS AS ROOT USER... IT WILL BREAK 100% OF THE TIME.
+DO NOT RUN THIS AS ROOT USER! IT WILL BREAK 100% OF THE TIME.
 
-So lets make a new user.
+To begin, lets make a new user.
 
 `adduser eco`
 
-Give user sudo permissions (Only used to make ELSM gobal)
+Next, lets give the user sudo permissions (Only used to make ELSM gobal)
 
 `usermod -a -G sudo eco`
 
