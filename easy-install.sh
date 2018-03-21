@@ -55,6 +55,7 @@ do_branch_choice
 echo -e ${yellow}"Downloading ELSM..."${NC}
 git clone https://github.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER.git /tmp/elsm
 cd /tmp/elsm
+git fetch
 git checkout $BRANCH
 chown -R eco:eco /tmp/elsm
 echo -e ${green}"ELSM successfully downloaded."${NC}
