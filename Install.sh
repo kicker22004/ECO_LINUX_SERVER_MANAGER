@@ -123,7 +123,8 @@ If you agree Please, continue." 15 60) then
         sleep 5
         echo XXX
         echo 40
-        echo "Setting up for world distruction :)"
+        echo "Set parameters"
+        echo "$LAST_HASH" > $INSTALL_LOC/Files/updater_data.cfg
         echo XXX
         sleep 2
         echo XXX
