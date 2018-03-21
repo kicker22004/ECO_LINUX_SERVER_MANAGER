@@ -61,7 +61,7 @@ echo -e ${green}"ELSM successfully downloaded."${NC}
 
 echo -e ${yellow}"Start ELSM Installer..."${NC}
 chmod +xX ./Install.sh
-./Install.sh
+./Install.sh $BRANCH
 echo -e ${green}"ELSM successfully installed."${NC}
 echo -e ${yellow}"Cleaning up..."${NC}
 rm -rf /tmp/elsm

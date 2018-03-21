@@ -4,6 +4,21 @@
 INSTALL_LOC=/opt/ELSM
 CPUINFO=`lscpu | grep "Architecture" | awk '{print $2}'`
 
+if [ $# = 1 ]; then
+  case $1 in
+    "master")
+      BRANCH="master"
+    ;;
+    "Beta")
+      BRANCH="Beta"
+    ;;
+    *)
+      echo "Wrong argument 1"
+    ;;
+  esac
+else
+  BRANCH="master"
+fi
 # Make sure we run with root privileges
 if [ $UID != 0 ]; then
 # not root, use sudo
@@ -99,6 +114,10 @@ But if your having issues you can start a clean install now." 20 60) then
 else
 	exit 0
 fi
+}
+do_config() {
+  #Add the branch in config.
+  sed -i "s/DEFAULT_BRANCH=.*/DEFAULT_BRANCH=$BRANCH/" $INSTALL_LOC/Files/conf.cfg
 }
 
 if [ ! -d "$INSTALL_LOC" ]; then
