@@ -138,18 +138,18 @@ echo "Choose an Backup Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Backup"
 W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
-  "2 Hours" "Often" off \
-  "4 Hours" "DEFAULT" on \
-  "6 Hours" "Delayed" off \
-  "Custom" "Custom" off \
+  "2 Hours" "Backup Often" off \
+  "4 Hours" "DEFAULT Backups" on \
+  "6 Hours" "Delayed Backups" off \
+  "Custom" "Custom Delay" off \
   3>&1 1>&2 2>&3)
-if [ "$W_BACKUPFREQ" = "15 Days" ]; then
+if [ "$W_BACKUPFREQ" = "2 Hours" ]; then
 jq '.BackupFrequencyInHours = "15"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$W_BACKUPFREQ" = "30 Days" ]; then
+if [ "$W_BACKUPFREQ" = "4 Hours" ]; then
 jq '.BackupFrequencyInHours = "30"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$W_BACKUPFREQ" = "60 Days" ]; then
+if [ "$W_BACKUPFREQ" = "6 Hours" ]; then
 jq '.BackupFrequencyInHours = "60"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPFREQ" = "Custom" ]; then	
