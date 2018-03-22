@@ -296,7 +296,6 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-	    do_optimize
 	    do_easy_config_choose_wtcpumax #adding for testing
 	    do_easy_config_meteorchoices #adding for testing
 	    do_easy_config_backupfreq #adding for testing
@@ -336,6 +335,7 @@ do_start_easy_config() {
 do_start_config() {
   #We start with the server name
   if (whiptail --fb --title "Server install" --yesno "There are two types of installation: \n Easy: for new users, Simple to setup and manage. \n Advanced: Master your World!"  --yes-button "Basic" --no-button "Advanced" 10 60) then
+    do_optimize #Prepare everything sooner before asking other questions of the users
     do_start_easy_config
   else
     do_optimize #Lets add the Optimize settings to get the Advanced users started
