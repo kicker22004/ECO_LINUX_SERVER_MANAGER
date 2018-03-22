@@ -136,7 +136,7 @@ do_easy_config_backupfreq() { #Backup Frequency
 echo "Choose a Backup Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Backup"
-W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
+W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
   "2 Hours" "Backup Often" off \
   "4 Hours" "DEFAULT Backups" on \
   "6 Hours" "Delayed Backups" off \
@@ -160,7 +160,7 @@ do_easy_config_meteorchoices() { #Meteor Doomsday Length Function
 echo "Choose a Meteor Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Disasters"
-W_METEoR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
+W_METEoR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
   "15 Days" "Hard Mode" off \
   "30 Days" "DEFAULT" on \
   "60 Days" "Careless Mode" off \
@@ -192,7 +192,7 @@ do_easy_config_choose_wtcpumax() { #Choose CPU Usage Preset
 echo "Choose a utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
-WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
+WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
   "Low Usage" "Weak Servers" off \
   "Medium Usage(Default)" "Most Servers" on \
   "High Usage" "Powerful Servers" off \
