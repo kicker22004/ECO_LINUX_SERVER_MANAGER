@@ -338,6 +338,7 @@ do_start_config() {
   if (whiptail --fb --title "Server install" --yesno "There are two types of installation: \n Easy: for new users, Simple to setup and manage. \n Advanced: Master your World!"  --yes-button "Basic" --no-button "Advanced" 10 60) then
     do_start_easy_config
   else
+    do_optimize
     do_start_advanced_config
   fi
 }
