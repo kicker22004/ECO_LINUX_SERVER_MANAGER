@@ -27,6 +27,7 @@ do_upgrade() {
     wget -q https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/Files/upgrade -O upgrade
     chmod +x upgrade
     /opt/ELSM/Files/upgrade "${LOCK[@]}"
+
     rm $GLOBAL_CONFIG/updater_data.cfg
     echo "$SERVER_SHA" > $GLOBAL_CONFIG/updater_data.cfg
     do_run_app

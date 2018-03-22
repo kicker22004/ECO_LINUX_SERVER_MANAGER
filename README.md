@@ -1,18 +1,18 @@
 # ECO LINUX SERVER MANAGER
 This is an easy to use set of scripts to host an ECO server on linux.
 ## For new users
-You only had to run this command:
+You only have to run this command:
 
-`wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/easy-install.sh; chmod +x ./easy-install.sh; ./easy-install.sh`
+`wget https://raw.githubusercontent.com/kicker22004/ECO_LINUX_SERVER_MANAGER/master/easy-install.sh; chmod +x ./easy-install.sh; sudo ./easy-install.sh`
 
 ## For advanced users
-YOU NEVER WANT TO RUN THIS AS ROOT USER... IT WILL BREAK 100% OF THE TIME.
+DO NOT RUN THIS AS ROOT USER! IT WILL BREAK 100% OF THE TIME.
 
-So lets make a user using root.
+To begin, lets make a new user.
 
 `adduser eco`
 
-Give sudo permissions (Only used to make ELSM gobal)
+Next, lets give the user sudo permissions (Only used to make ELSM gobal)
 
 `usermod -a -G sudo eco`
 
@@ -32,6 +32,6 @@ Optional (For **really** advanced users), checkout to beta for lastest features.
 
 And to launch do:
 
-`./Install.sh`
+`sudo ./Install.sh`
 
 This Program is now at a point where it can be used, use at your own risk....
