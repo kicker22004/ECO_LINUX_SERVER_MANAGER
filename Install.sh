@@ -98,7 +98,7 @@ do_config() {
   #Add the branch in config.
   BRANCH=$(git branch | grep \* | cut -d ' ' -f2-)
   sed -i "s/DEFAULT_BRANCH=.*/DEFAULT_BRANCH=$BRANCH/" $INSTALL_LOC/Files/conf.cfg
-  LAST_HASH=$(git log --pretty=format:'%h' -n 1)
+  LAST_HASH=$(git rev-parse HEAD)
   sed -i "s/ELSM_HASH=.*/ELSM_HASH=$BRANCH/" $INSTALL_LOC/Files/conf.cfg
 }
 
