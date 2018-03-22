@@ -40,12 +40,13 @@ do_upgrade_gui() {
     fi
 }
 do_check_updates() {
-    SERVER_SHA=$(curl -s https://api.github.com/repos/${GITHUB_ORGANIZATION_NAME}/${REPO_NAME}/commits/${DEFAULT_BRANCH} | jq '.sha' | sed 's/"//g');
+    source $GLOBAL_CONFIG/conf.cfg
+    SERVER_SHA=$(curl -s https://api.github.com/repos/"${GITHUB_ORGANIZATION_NAME}"/"${REPO_NAME}"/commits/"${DEFAULT_BRANCH}" | jq '.sha' | sed 's/"//g');
+    echo ${GITHUB_ORGANIZATION_NAME}" / "${REPO_NAME}" / "${DEFAULT_BRANCH}
     LOCAL_SHA=$(<$GLOBAL_CONFIG/updater_data.cfg)
     echo -e ${yellow}"Version found online: "${green}"$SERVER_SHA"${NC}
     echo -e ${yellow}"Currently Installed Version: "${green}"$ELSM_VERSION"${NC}
     echo -e ${green}"Created and Maintained by: Kicker22004 and all the contributors <3"${NC}
-
     if [ $SERVER_SHA = $LOCAL_SHA ]; then
         do_run_app
     else
@@ -56,9 +57,7 @@ do_run() {
 #Dir variables, do not touch
 DIR="/opt/ELSM/Server"
 GLOBAL_CONFIG="/opt/ELSM/Files"
-source $DIR/$SELECTED_DIR/conf.cfg
 LOCK=$SELECTED_DIR
-cd $INSTALL_LOC
 do_check_updates
 }
 do_run
