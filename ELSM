@@ -144,13 +144,13 @@ W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choic
   "Custom" "Custom Delay" off \
   3>&1 1>&2 2>&3)
 if [ "$W_BACKUPFREQ" = "2 Hours" ]; then
-jq '.BackupFrequencyInHours = "15"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.BackupFrequencyInHours = "2"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPFREQ" = "4 Hours" ]; then
-jq '.BackupFrequencyInHours = "30"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.BackupFrequencyInHours = "4"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPFREQ" = "6 Hours" ]; then
-jq '.BackupFrequencyInHours = "60"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.BackupFrequencyInHours = "6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPFREQ" = "Custom" ]; then	
 custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 10 60 "2.5" 3>&1 1>&2 2>&3)	
