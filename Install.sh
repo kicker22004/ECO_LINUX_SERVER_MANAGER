@@ -98,8 +98,7 @@ do_config() {
   #Add the branch in config.
   BRANCH=$(git branch | grep \* | cut -d ' ' -f2-)
   sed -i "s/DEFAULT_BRANCH=.*/DEFAULT_BRANCH=$BRANCH/" $INSTALL_LOC/Files/conf.cfg
-  LAST_HASH=$(git log --pretty=format:'%h' -n 1)
-  sed -i "s/ELSM_HASH=.*/ELSM_HASH=$BRANCH/" $INSTALL_LOC/Files/conf.cfg
+  LAST_HASH=$(git rev-parse HEAD)
 }
 
 if [ ! -d "$INSTALL_LOC" ]; then
@@ -124,6 +123,7 @@ If you agree Please, continue." 15 60) then
         echo XXX
         echo 40
         echo "Set parameters"
+        do_config
         echo "$LAST_HASH" > $INSTALL_LOC/Files/updater_data.cfg
         echo XXX
         sleep 2
