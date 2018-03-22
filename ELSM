@@ -137,7 +137,7 @@ do_easy_config_backupfreq() { #Test for new Function
 echo "Choose an Backup Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Backup"
-W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
+W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
   "2 Hours" "Backup Often" off \
   "4 Hours" "DEFAULT Backups" on \
   "6 Hours" "Delayed Backups" off \
@@ -153,7 +153,7 @@ if [ "$W_BACKUPFREQ" = "6 Hours" ]; then
 jq '.BackupFrequencyInHours = "6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPFREQ" = "Custom" ]; then	
-custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 10 60 "2.5" 3>&1 1>&2 2>&3)	
+custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 28 60 "2.5" 3>&1 1>&2 2>&3)	
 jq ".BackupFrequencyInHours = \"${custom_backup_freq}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -161,7 +161,7 @@ do_easy_config_meteorchoices() { #Test for new Function
 echo "Choose an Meteor Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Disasters"
-W_METEoR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
+W_METEoR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
   "15 Days" "Hard Mode" off \
   "30 Days" "DEFAULT" on \
   "60 Days" "Careless Mode" off \
@@ -185,7 +185,7 @@ if [ "$W_METEOR" = "Off" ]; then
 jq '.CreateMeteor = "false"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_METEOR" = "Custom" ]; then	
-custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 10 60 "44" 3>&1 1>&2 2>&3)	
+custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 28 60 "44" 3>&1 1>&2 2>&3)	
 jq ".MeteorImpactDays = \"${custom_meteor}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -193,7 +193,7 @@ do_easy_config_choose_wtcpumax() {
 echo "Choose an utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
-WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
+WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
   "Low Usage" "Weak Servers" off \
   "Medium Usage(Default)" "Most Servers" on \
   "High Usage" "Powerful Servers" off \
@@ -209,7 +209,7 @@ if [ "$WT_CPUMAX" = "High Usage" ]; then
 jq '.WorldTickCPUMax = "0.58"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$WT_CPUMAX" = "Custom" ]; then	
-customcpu=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 10 60 "0.44" 3>&1 1>&2 2>&3)	
+customcpu=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 28 60 "0.44" 3>&1 1>&2 2>&3)	
 jq ".WorldTickCPUMax = \"${customcpu}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
