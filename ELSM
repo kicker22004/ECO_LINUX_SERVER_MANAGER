@@ -133,11 +133,35 @@ SEL="World"
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco"
 }
 #Functions used for easy config
+do_easy_config_backupfreq() { #Test for new Function
+echo "Choose an Backup Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Backup"
+W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
+  "2 Hours" "Backup Often" off \
+  "4 Hours" "DEFAULT Backups" on \
+  "6 Hours" "Delayed Backups" off \
+  "Custom" "Custom Delay" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_BACKUPFREQ" = "2 Hours" ]; then
+jq '.BackupFrequencyInHours = "2"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "4 Hours" ]; then
+jq '.BackupFrequencyInHours = "4"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "6 Hours" ]; then
+jq '.BackupFrequencyInHours = "6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "Custom" ]; then	
+custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 10 60 "2.5" 3>&1 1>&2 2>&3)	
+jq ".BackupFrequencyInHours = \"${custom_backup_freq}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
+}
 do_easy_config_meteorchoices() { #Test for new Function
-echo "Choose an utilization Preset"
+echo "Choose an Meteor Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Disasters"
-WT_METEOR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
+W_METEoR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 20 60 10\
   "15 Days" "Hard Mode" off \
   "30 Days" "DEFAULT" on \
   "60 Days" "Careless Mode" off \
@@ -145,22 +169,22 @@ WT_METEOR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices:
   "Off" "No Meteor" off \
   "Custom" "Custom Days" off \
   3>&1 1>&2 2>&3)
-if [ "$WT_METEOR" = "15 Days" ]; then
+if [ "$W_METEOR" = "15 Days" ]; then
 jq '.MeteorImpactDays = "15"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$WT_METEOR" = "30 Days" ]; then
+if [ "$W_METEOR" = "30 Days" ]; then
 jq '.MeteorImpactDays = "30"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$WT_METEOR" = "60 Days" ]; then
+if [ "$W_METEOR" = "60 Days" ]; then
 jq '.MeteorImpactDays = "60"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$WT_METEOR" = "90 Days" ]; then
+if [ "$W_METEOR" = "90 Days" ]; then
 jq '.MeteorImpactDays = "90"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$WT_METEOR" = "Off" ]; then
+if [ "$W_METEOR" = "Off" ]; then
 jq '.CreateMeteor = "false"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$WT_METEOR" = "Custom" ]; then	
+if [ "$W_METEOR" = "Custom" ]; then	
 custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 10 60 "44" 3>&1 1>&2 2>&3)	
 jq ".MeteorImpactDays = \"${custom_meteor}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
@@ -276,6 +300,7 @@ do_start_easy_config() {
 	    do_optimize
 	    do_easy_config_choose_wtcpumax #adding for testing
 	    do_easy_config_meteorchoices #adding for testing
+	    do_easy_config_backupfreq #adding for testing
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
