@@ -130,11 +130,11 @@ SEL="World"
   sed -i "6 d" "$CONFIGS/World.eco" #Same as above
   sed -i '5s/^/ },\n/' "$CONFIGS/World.eco" #Add neccesary }, to the file
   sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/World.eco" #Add WorldTickCPUMax Option and new line the bracket
-  sed -i 's/60/300/g' "$CONFIGS/Storage.eco"
+  sed -i 's/60/300/g' "$CONFIGS/Storage.eco" #Modifies Save frequency from 60 to 300
 }
 #Functions used for easy config
-do_easy_config_backupfreq() { #Test for new Function
-echo "Choose an Backup Preset"
+do_easy_config_backupfreq() { #Backup Frequency
+echo "Choose a Backup Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Backup"
 W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
@@ -157,8 +157,8 @@ custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox 
 jq ".BackupFrequencyInHours = \"${custom_backup_freq}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
-do_easy_config_meteorchoices() { #Test for new Function
-echo "Choose an Meteor Preset"
+do_easy_config_meteorchoices() { #Meteor Doomsday Length Function
+echo "Choose a Meteor Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Disasters"
 W_METEoR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
@@ -189,8 +189,8 @@ custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custo
 jq ".MeteorImpactDays = \"${custom_meteor}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
-do_easy_config_choose_wtcpumax() {
-echo "Choose an utilization Preset"
+do_easy_config_choose_wtcpumax() { #Choose CPU Usage Preset
+echo "Choose a utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
 WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
