@@ -136,7 +136,7 @@ do_easy_config_backupfreq() { #Backup Frequency
 echo "Choose a Backup Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Backup"
-W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
+W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
   "2 Hours" "Backup Often" off \
   "4 Hours" "DEFAULT Backups" on \
   "6 Hours" "Delayed Backups" off \
@@ -160,7 +160,7 @@ do_easy_config_meteorchoices() { #Meteor Doomsday Length Function
 echo "Choose a Meteor Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Disasters"
-W_METEoR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
+W_METEOR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
   "15 Days" "Hard Mode" off \
   "30 Days" "DEFAULT" on \
   "60 Days" "Careless Mode" off \
@@ -192,7 +192,7 @@ do_easy_config_choose_wtcpumax() { #Choose CPU Usage Preset
 echo "Choose a utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
-WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 50 60 10\
+WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
   "Low Usage" "Weak Servers" off \
   "Medium Usage(Default)" "Most Servers" on \
   "High Usage" "Powerful Servers" off \
@@ -296,7 +296,6 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-	    do_optimize
 	    do_easy_config_choose_wtcpumax #adding for testing
 	    do_easy_config_meteorchoices #adding for testing
 	    do_easy_config_backupfreq #adding for testing
@@ -338,7 +337,6 @@ do_start_config() {
   if (whiptail --fb --title "Server install" --yesno "There are two types of installation: \n Easy: for new users, Simple to setup and manage. \n Advanced: Master your World!"  --yes-button "Basic" --no-button "Advanced" 10 60) then
     do_start_easy_config
   else
-    do_optimize #Lets add the Optimize settings to get the Advanced users started
     do_start_advanced_config
   fi
 }
@@ -501,6 +499,7 @@ echo $SELECTED_DIR
 cp $INSTALL_LOC/Files/conf.cfg $DIR/$SELECTED_DIR/
 
 source $DIR/$SELECTED_DIR/conf.cfg
+do_optimize #Prepare everything sooner before asking other questions of the users
 do_world_size
 do_start_config
 do_first_run
