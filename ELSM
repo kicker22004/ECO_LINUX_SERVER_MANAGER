@@ -122,7 +122,6 @@ fi
 }
 do_optimize() {
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
-SEL="World"
   #Optimize Function
   #Still important to add WorldTickCPUMax to the World.eco file prior to setting the option for the user
   echo "Optimizing Server..."
