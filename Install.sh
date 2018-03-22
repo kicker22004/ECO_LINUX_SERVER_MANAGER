@@ -3,7 +3,6 @@
 ## Eco Linux Server Manager Installer##
 INSTALL_LOC=/opt/ELSM
 CPUINFO=`lscpu | grep "Architecture" | awk '{print $2}'`
-
 # Make sure we run with root privileges
 if [ $UID != 0 ]; then
 # not root, use sudo
@@ -24,27 +23,23 @@ fi
 do_deps() {
 ##Debian mini fix (Missing lsb_release to detect version for mono)
 if hash apt-get 2>/dev/null; then
-  apt-get -y install lsb-release
+  apt-get -qq install lsb-release
   ##Detect OS
   DISTRO=$(lsb_release --id | awk '{print tolower($3)}')
   CODENAME=$(lsb_release --codename | awk '{print $2}')
-  apt-get -y update > /dev/null
-  apt-get -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano > /dev/null
+  apt-get -qq update
+  apt-get -qq install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano > /dev/null
   apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
   echo "deb http://download.mono-project.com/repo/$DISTRO beta-$CODENAME main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
-  apt-get -y update > /dev/null
-  apt-get -y --allow-unauthenticated install mono-devel > /dev/null
+  apt-get -qq update
+  apt-get -qq --allow-unauthenticated install mono-devel
+  echo -e "Deps installed !"
 else
   yum -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano
   rpm --import "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
   su -c 'curl https://download.mono-project.com/repo/centos7-preview.repo | tee /etc/yum.repos.d/mono-centos7-preview.repo'
   yum install mono-complete
 fi
-##Currently hardcoded for Mono Beta (5.8) on Ubuntu and Debian.
-apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-echo "deb http://download.mono-project.com/repo/$DISTRO beta-$CODENAME main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
-apt-get -y update
-apt-get -y --allow-unauthenticated install mono-devel
 }
 
 do_arm() {
@@ -99,7 +94,12 @@ else
 	exit 0
 fi
 }
-
+do_config() {
+  #Add the branch in config.
+  BRANCH=$(git branch | grep \* | cut -d ' ' -f2-)
+  sed -i "s/DEFAULT_BRANCH=.*/DEFAULT_BRANCH=$BRANCH/" $INSTALL_LOC/Files/conf.cfg
+  LAST_HASH=$(git rev-parse HEAD)
+}
 
 if [ ! -d "$INSTALL_LOC" ]; then
         if (whiptail --fb --title "ELSM Installer" --yesno "Welcome to the ECO LINUX SERVER MANAGER. \
@@ -115,14 +115,16 @@ If you agree Please, continue." 15 60) then
 	mkdir $INSTALL_LOC/Backup
 	mkdir $INSTALL_LOC/Files
 	mkdir $INSTALL_LOC/Files/ELSM_LOGS
-        mkdir $INSTALL_LOC/Server
+  mkdir $INSTALL_LOC/Server
 	touch $INSTALL_LOC/Files/ELSM_LOGS/ELSM.log
 	cp Files/* $INSTALL_LOC/Files
         echo XXX
         sleep 5
         echo XXX
         echo 40
-        echo "Setting up for world distruction :)"
+        echo "Set parameters"
+        do_config
+        echo "$LAST_HASH" > $INSTALL_LOC/Files/updater_data.cfg
         echo XXX
         sleep 2
         echo XXX

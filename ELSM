@@ -38,7 +38,7 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
      cd $INSTALL_LOC/Files/
      $WATCH_START "${SELECTED_DIR[@]}"
   else
-     echo "Server was found running... close it before running this"
+     echo "Server is already running... Please close it before running this."
   fi
   if ! screen -list | grep -q "WATCH"; then
      cd $INSTALL_LOC/Files/
@@ -54,7 +54,7 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
     $WATCH_STOP
     screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
   else
-     echo "No server was found to be running...did you start one?"
+     echo "No server was found to be running... Did you start one?"
   fi
 }
 
@@ -120,18 +120,98 @@ jq ".Dimensions.x = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 jq ".Dimensions.y = \"${size}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 }
-
+do_optimize() {
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+  #Optimize Function
+  #Still important to add WorldTickCPUMax to the World.eco file prior to setting the option for the user
+  echo "Optimizing Server..."
+  sed -i "5 d" "$CONFIGS/World.eco" #Remove lines that we are editing
+  sed -i "6 d" "$CONFIGS/World.eco" #Same as above
+  sed -i '5s/^/ },\n/' "$CONFIGS/World.eco" #Add neccesary }, to the file
+  sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/World.eco" #Add WorldTickCPUMax Option and new line the bracket
+  sed -i 's/60/300/g' "$CONFIGS/Storage.eco" #Modifies Save frequency from 60 to 300
+}
 #Functions used for easy config
-do_easy_config_worldtickcpumax() {
+do_easy_config_backupfreq() { #Backup Frequency
+echo "Choose a Backup Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Backup"
+W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+  "2 Hours" "Backup Often" off \
+  "4 Hours" "DEFAULT Backups" on \
+  "6 Hours" "Delayed Backups" off \
+  "Custom" "Custom Delay" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_BACKUPFREQ" = "2 Hours" ]; then
+jq '.BackupFrequencyInHours = "2"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "4 Hours" ]; then
+jq '.BackupFrequencyInHours = "4"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "6 Hours" ]; then
+jq '.BackupFrequencyInHours = "6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "Custom" ]; then	
+custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 28 60 "2.5" 3>&1 1>&2 2>&3)	
+jq ".BackupFrequencyInHours = \"${custom_backup_freq}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
+}
+do_easy_config_meteorchoices() { #Meteor Doomsday Length Function
+echo "Choose a Meteor Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Disasters"
+W_METEOR=$(whiptail --fb --title "Meteor Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+  "15 Days" "Hard Mode" off \
+  "30 Days" "DEFAULT" on \
+  "60 Days" "Careless Mode" off \
+  "90 Days" "Effortless Mode" off \
+  "Off" "No Meteor" off \
+  "Custom" "Custom Days" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_METEOR" = "15 Days" ]; then
+jq '.MeteorImpactDays = "15"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_METEOR" = "30 Days" ]; then
+jq '.MeteorImpactDays = "30"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_METEOR" = "60 Days" ]; then
+jq '.MeteorImpactDays = "60"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_METEOR" = "90 Days" ]; then
+jq '.MeteorImpactDays = "90"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_METEOR" = "Off" ]; then
+jq '.CreateMeteor = "false"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_METEOR" = "Custom" ]; then	
+custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 28 60 "44" 3>&1 1>&2 2>&3)	
+jq ".MeteorImpactDays = \"${custom_meteor}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
+}
+do_easy_config_choose_wtcpumax() { #Choose CPU Usage Preset
+echo "Choose a utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
-  #Set WorldTickCPUMax WORKING
-  sed -i "5 d" "$CONFIGS/$SEL.eco" #Remove lines that we are editing
-  sed -i "6 d" "$CONFIGS/$SEL.eco" #Same as above
-  sed -i '5s/^/ },\n/' "$CONFIGS/$SEL.eco" #Add neccesary }, to the file
-  sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/$SEL.eco" #Add WorldTickCPUMax Option and new line the bracket
+WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+  "Low Usage" "Weak Servers" off \
+  "Medium Usage(Default)" "Most Servers" on \
+  "High Usage" "Powerful Servers" off \
+  "Custom" "Custom Setting" off \
+  3>&1 1>&2 2>&3)
+if [ "$WT_CPUMAX" = "Low Usage" ]; then
+jq '.WorldTickCPUMax = "0.2"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_CPUMAX" = "Medium Usage(Default)" ]; then
+jq '.WorldTickCPUMax = "0.42"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_CPUMAX" = "High Usage" ]; then
+jq '.WorldTickCPUMax = "0.58"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$WT_CPUMAX" = "Custom" ]; then	
+customcpu=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 28 60 "0.44" 3>&1 1>&2 2>&3)	
+jq ".WorldTickCPUMax = \"${customcpu}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
 }
-
 do_easy_config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
@@ -146,7 +226,6 @@ do_easy_config_serverDesc() {
     exit 1
   fi
 }
-
 do_easy_config_serverPassword() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
@@ -165,7 +244,6 @@ do_easy_config_serverPassword() {
     exit 1
   fi
 }
-
 do_easy_config_serverType() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
@@ -218,7 +296,9 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-	    do_easy_config_worldtickcpumax
+	    do_easy_config_choose_wtcpumax #adding for testing
+	    do_easy_config_meteorchoices #adding for testing
+	    do_easy_config_backupfreq #adding for testing
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
@@ -283,7 +363,7 @@ do_first_run() {
         sleep 1
         echo XXX
         echo 50
-        echo "LONG WAIT, UP TO 1HOUR!!!!"
+        echo "LONG WAIT" #shouldn't be as long as it used to be
 	source $DIR/$SELECTED_DIR/conf.cfg
 	cd $DIR/$SELECTED_DIR/
 	$START
@@ -379,7 +459,7 @@ $WATCH_STOP
 $STOP
 sleep 3
 if ! screen -list | grep -o "${MONITOR}"; then
-whiptail --msgbox --fb "Your server had been killed, Returning to the main menu." 20 60 0
+whiptail --msgbox --fb "Your server has been killed, Returning to the main menu." 20 60 0
 do_menu
 fi
 }
@@ -405,7 +485,7 @@ fi
 r=$(wget $dl_link -O $DIR/$SELECTED_DIR/$SELECTED_VERSION)
 
 if [ $? -ne 0 ]; then
-whiptail --msgbox --clear --fb "Download failed!, check your internet and the link.\
+whiptail --msgbox --clear --fb "Download failed!, check your internet connection and the link.\
 The current link is: $dl_link" 20 60
 fi
 
@@ -419,6 +499,7 @@ echo $SELECTED_DIR
 cp $INSTALL_LOC/Files/conf.cfg $DIR/$SELECTED_DIR/
 
 source $DIR/$SELECTED_DIR/conf.cfg
+do_optimize #Prepare everything sooner before asking other questions of the users
 do_world_size
 do_start_config
 do_first_run
@@ -426,7 +507,7 @@ do_stagetwo
 }
 
 do_upgrade() {
-whiptail --msgbox --fb --title "404" "This menu is going to be disabled for right now, It's a bit to rushed and I would like to fine tune it more. Sorry guys i'll get to it soon." 20 60 0
+whiptail --msgbox --fb --title "404" "This menu is going to be disabled for now, It's a bit to rushed and I would like to fine tune it more. Sorry guys i'll get to it soon." 20 60 0
 }
 #if screen -list | grep -q "ECO"; then
 #    cd $DIR/$SELECTED_DIR
@@ -536,7 +617,7 @@ fi
 }
 
 do_map_reset() {
-whiptail --fb --yesno "This will reset your world and backups, A new world will be built...Continue?" 10 60 \
+whiptail --fb --yesno "This will reset your world and backups, A new world will be built... Continue?" 10 60 \
     --yes-button Yes --no-button No
   RET=$?
   if [ $RET -eq 0 ]; then
@@ -545,12 +626,12 @@ whiptail --fb --yesno "This will reset your world and backups, A new world will 
 	$STOP
 	rm -rf $DIR/$SELECTED_DIR/Storage/*
 	$WATCH_START
-	whiptail --msgbox --fb "Your server is now Generating the new world!, please give it time." 15 60
+	whiptail --msgbox --fb "Your server is now Generating a new world!, please give it time." 15 60
 fi
 }
 
 do_complete_wipe() {
-whiptail --fb --yesno "This will completely erase your server and configs...Continue?" 10 60 \
+whiptail --fb --yesno "This will completely erase your server and configs... Continue?" 10 60 \
     --yes-button Yes --no-button No
   RET=$?
   if [ $RET -eq 0 ]; then
@@ -559,7 +640,7 @@ whiptail --fb --yesno "This will completely erase your server and configs...Cont
        	$STOP
        	rm -rf $SELECTED_DIR/*
 	do_install
-        whiptail --msgbox --fb "Your server is now Generating the new world!, please give it time." 15 60
+        whiptail --msgbox --fb "Your server is now Generating a new world!, please give it time." 15 60
 fi
 }
 
@@ -838,7 +919,7 @@ UPTIME=$(ps -o etime= -p $ELSM_PID)
 LOAD=$(uptime | grep -o "load average.*")
 RAM=$(free -mh | grep Mem | awk '{print $4}')
 RAM_TOTAL=$(free -mh | grep "Mem" | awk '{print $2}')
-TOTAL=$(du -sh $SELECTED_DIR | awk '{print $1}')
+TOTAL=$(du -sh $DIR/$SELECTED_DIR | awk '{print $1}')
 HDD_TOTAL=$(df -kh . | grep / | awk '{print $4}')
 MONO_VERSION=$(mono -V | grep version.* | cut -d " " -f 5)
 whiptail --fb --clear --title "Current server stats" --yesno --yes-button REFRESH --no-button Back \
