@@ -335,10 +335,8 @@ do_start_easy_config() {
 do_start_config() {
   #We start with the server name
   if (whiptail --fb --title "Server install" --yesno "There are two types of installation: \n Easy: for new users, Simple to setup and manage. \n Advanced: Master your World!"  --yes-button "Basic" --no-button "Advanced" 10 60) then
-    do_optimize #Prepare everything sooner before asking other questions of the users
     do_start_easy_config
   else
-    do_optimize #Lets add the Optimize settings to get the Advanced users started
     do_start_advanced_config
   fi
 }
@@ -501,6 +499,7 @@ echo $SELECTED_DIR
 cp $INSTALL_LOC/Files/conf.cfg $DIR/$SELECTED_DIR/
 
 source $DIR/$SELECTED_DIR/conf.cfg
+do_optimize #Prepare everything sooner before asking other questions of the users
 do_world_size
 do_start_config
 do_first_run
