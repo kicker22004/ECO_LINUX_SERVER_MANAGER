@@ -365,7 +365,7 @@ do_first_run() {
         sleep 1
         echo XXX
         echo 50
-        echo "LONG WAIT, UP TO 1HOUR!!!!"
+        echo "LONG WAIT" #shouldn't be as long as it used to be
 	source $DIR/$SELECTED_DIR/conf.cfg
 	cd $DIR/$SELECTED_DIR/
 	$START
