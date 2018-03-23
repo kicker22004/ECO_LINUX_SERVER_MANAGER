@@ -132,7 +132,30 @@ CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco" #Modifies Save frequency from 60 to 300
 }
 #Functions used for easy config
-do_easy_config_backupskept() { #Backup Frequency
+do_easy_config_collaboration() { #Collaboration Settings
+echo "Choose a Collaboration Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Difficulty"
+W_COLLABORATION=$(whiptail --fb --title "Collaboration Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+  "None" "1 - 6 Players" off \
+  "Low" "6 - 10 Players" on \
+  "Medium" "10 - 30 Players" off \
+  "High" "30+ Players" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_COLLABORATION" = "None" ]; then
+jq '.BackupFrequencyInHours = "NoCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_COLLABORATION" = "Low" ]; then
+jq '.BackupFrequencyInHours = "LowCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_COLLABORATION" = "Medium" ]; then
+jq '.BackupFrequencyInHours = "MediumCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_COLLABORATION" = "High" ]; then
+jq '.BackupFrequencyInHours = "HighCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+}
+do_easy_config_backupskept() { #Backups Kept
 echo "How many Backups to keep."
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Backup"
@@ -324,10 +347,11 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-	    do_easy_config_choose_wtcpumax
-	    do_easy_config_meteorchoices
-	    do_easy_config_backupfreq
-	    do_easy_config_backupskept #adding for testing
+            do_easy_config_choose_wtcpumax
+            do_easy_config_meteorchoices
+            do_easy_config_backupfreq
+            do_easy_config_collaboration #adding for Testing
+            do_easy_config_backupskept #adding for testing
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
