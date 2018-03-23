@@ -1,42 +1,47 @@
-adduser / addgroup Command
+#adduser / addgroup Command
+=====================
 The adduser and addgroup commands are used to add a user and group to the system respectively according to the default configuration specified in /etc/adduser.conf file.
 `sudo adduser eco`
 Begins the Add User process
 
-agetty Command
+#agetty Command
+=====================
 agetty is a program which manages physical or virtual terminals and is invoked by init. Once it detects a connection, it opens a tty port, asks for a user’s login name and calls up the /bin/login command. Agetty is a substitute of Linux getty:
 `agetty -L 9600 ttyS1 vt100`
 
-alias Command
+#alias Command
+=====================
 alias is a useful shell built-in command for creating aliases (shortcut) to a Linux command on a system. It is helpful for creating new/custom commands from existing Shell/Linux commands (including options):
 `alias home=cd /home/eco/public_html`
 The above command will create an alias called home for /home/eco/public_html directory, so whenever you type home in the terminal prompt, it will put you in the /home/eco/public_html directory.
 
-apropos Command
+#apropos Command
+=====================
 apropos command is used to search and display a short man page description of a command/program as follows.
 `apropos adduser`
 
-apt Command
+#apt Command
+=====================
 apt tool is a relatively new higher-level package manager for Debian/Ubuntu systems:
 `sudo apt update`
 
-apt-get Command
+#apt-get Command
+=====================
 apt-get is a powerful and free front-end package manager for Debian/Ubuntu systems. It is used to install new software packages, remove available software packages, upgrade existing software packages as well as upgrade entire operating system.
 `sudo apt-get update`
 
-aptitude Command
-aptitude is a powerful text-based interface to the Debian GNU/Linux package management system. Like apt-get and apt; it can be used to install, remove or upgrade software packages on a system.
-`sudo aptitude update`
-
-arch Command
+#arch Command
+=====================
 arch is a simple command for displaying machine architecture or hardware name (similar to uname -m):
 `arch`
 
-arp Command
+#arp Command
+=====================
 ARP (Address Resolution Protocol) is a protocol that maps IP network addresses of a network neighbor with the hardware (MAC) addresses in an IPv4 network.
 `sudo arp-scan --interface=enp2s0 --localnet `
 
-at Command
+#at Command
+=====================
 at command is used to schedule tasks to run in a future time. It’s an alternative to cron and anacron, however, it runs a task once at a given future time without editing any config files:
 
 For example, to shutdown the system at 23:55 today, run:
