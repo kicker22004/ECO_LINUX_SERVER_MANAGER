@@ -163,7 +163,7 @@ W_BACKUPS_KEPT=$(whiptail --fb --title "How many Backups should you keep?" --rad
   "5" "DEFAULT Backups" on \
   "10" "More Backups" off \
   "15" "Lots of Backups" off \
-  "20" "Lots of Backups" off \
+  "20" "TONS of Backups" off \
   "Custom" "Custom Backups saved" off \
   3>&1 1>&2 2>&3)
 if [ "$W_BACKUPS_KEPT" = "5" ]; then
