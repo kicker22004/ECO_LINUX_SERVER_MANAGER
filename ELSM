@@ -133,10 +133,10 @@ CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 }
 #Functions used for easy config
 do_easy_config_collaboration() { #Collaboration Settings
-echo "Choose a Collaboration Preset"
+echo "Choose Collaboration Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Difficulty"
-W_COLLABORATION=$(whiptail --fb --title "Collaboration Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+W_COLLABORATION=$(whiptail --fb --title "Collaboration Settings" --radiolist "Collaboration Choices: (Spacebar to select!)" 23 60 10\
   "None" "1 - 6 Players" off \
   "Low" "6 - 10 Players" on \
   "Medium" "10 - 30 Players" off \
@@ -164,7 +164,7 @@ W_BACKUPS_KEPT=$(whiptail --fb --title "How many Backups should you keep?" --rad
   "5" "DEFAULT Backups" on \
   "8" "More Backups" off \
   "12" "Lots of Backups" off \
-  "Custom" "Custom ammount" off \
+  "Custom" "Custom Backups saved" off \
   3>&1 1>&2 2>&3)
 if [ "$W_BACKUPS_KEPT" = "3" ]; then
 jq '.NumBackupsToKeep = "3"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
@@ -342,17 +342,17 @@ do_start_easy_config() {
        port2=$(netstat -an | grep $Wport | grep LISTEN)
         if [[ ! -z  port1 ]]; then
           if [[ ! -z port2 ]]; then
-            #Set the ports in config file
+            #Set the Configs, guiding the user
             jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-            do_easy_config_choose_wtcpumax
+	    do_easy_config_collaboration #adding for Testing
             do_easy_config_meteorchoices
-            do_easy_config_backupfreq
-            do_easy_config_collaboration #adding for Testing
+	    do_easy_config_backupfreq
             do_easy_config_backupskept #adding for testing
-            whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
+	    do_easy_config_choose_wtcpumax
+            whiptail --fb --title "Server Config" --msgbox "Server option setup finished!" 10 60
           else
             echo "Port already taken"
             echo "Var: \"${port1}\""
