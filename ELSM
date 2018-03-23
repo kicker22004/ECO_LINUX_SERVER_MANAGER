@@ -132,7 +132,7 @@ CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco" #Modifies Save frequency from 60 to 300
 }
 #Functions used for easy config
-do_easy_config_collaboration() { #Backup Frequency
+do_easy_config_collaboration() { #Collaboration Settings
 echo "Choose a Collaboration Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Difficulty"
@@ -347,10 +347,11 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-	    do_easy_config_choose_wtcpumax 
-	    do_easy_config_meteorchoices 
-	    do_easy_config_backupfreq 
-	    do_easy_config_collaboration #adding for Testing
+            do_easy_config_choose_wtcpumax
+            do_easy_config_meteorchoices
+            do_easy_config_backupfreq
+            do_easy_config_collaboration #adding for Testing
+            do_easy_config_backupskept #adding for testing
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
