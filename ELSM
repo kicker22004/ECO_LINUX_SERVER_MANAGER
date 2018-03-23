@@ -160,23 +160,23 @@ echo "How many Backups to keep."
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Backup"
 W_BACKUPS_KEPT=$(whiptail --fb --title "How many Backups should you keep?" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
-  "3" "Few Backups saved" off \
   "5" "DEFAULT Backups" on \
-  "8" "More Backups" off \
-  "12" "Lots of Backups" off \
+  "10" "More Backups" off \
+  "15" "Lots of Backups" off \
+  "20" "TONS of Backups" off \
   "Custom" "Custom Backups saved" off \
   3>&1 1>&2 2>&3)
-if [ "$W_BACKUPS_KEPT" = "3" ]; then
-jq '.NumBackupsToKeep = "3"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-fi
 if [ "$W_BACKUPS_KEPT" = "5" ]; then
 jq '.NumBackupsToKeep = "5"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$W_BACKUPS_KEPT" = "8" ]; then
-jq '.NumBackupsToKeep = "8"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+if [ "$W_BACKUPS_KEPT" = "10" ]; then
+jq '.NumBackupsToKeep = "10"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
-if [ "$W_BACKUPS_KEPT" = "12" ]; then
-jq '.NumBackupsToKeep = "12"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+if [ "$W_BACKUPS_KEPT" = "15" ]; then
+jq '.NumBackupsToKeep = "15"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPS_KEPT" = "20" ]; then
+jq '.NumBackupsToKeep = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPS_KEPT" = "Custom" ]; then	
 custom_backup_kept=$(whiptail --fb --title "Custom Backup Option" --inputbox "Custom Backup Choice:" 10 60 "15" 3>&1 1>&2 2>&3)	
@@ -191,6 +191,7 @@ W_BACKUPFREQ=$(whiptail --fb --title "Backup Frequency Settings" --radiolist "Ba
   "2 Hours" "Backup Often" off \
   "4 Hours" "DEFAULT Backups" on \
   "6 Hours" "Delayed Backups" off \
+  "12 Hours" "Two Backups a day" off \
   "Custom" "Custom Delay" off \
   3>&1 1>&2 2>&3)
 if [ "$W_BACKUPFREQ" = "2 Hours" ]; then
@@ -201,6 +202,9 @@ jq '.BackupFrequencyInHours = "4"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPFREQ" = "6 Hours" ]; then
 jq '.BackupFrequencyInHours = "6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPFREQ" = "12 Hours" ]; then
+jq '.BackupFrequencyInHours = "12"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPFREQ" = "Custom" ]; then	
 custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 10 60 "5" 3>&1 1>&2 2>&3)	
@@ -352,7 +356,7 @@ do_start_easy_config() {
 	    do_easy_config_backupfreq
             do_easy_config_backupskept #adding for testing
 	    do_easy_config_choose_wtcpumax
-            whiptail --fb --title "Server Config" --msgbox "Server option setup finished!" 10 60
+            whiptail --fb --title "Server Config" --msgbox "Server options setup finished!" 10 60
           else
             echo "Port already taken"
             echo "Var: \"${port1}\""
