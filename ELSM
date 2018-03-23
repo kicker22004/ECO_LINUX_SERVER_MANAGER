@@ -143,16 +143,16 @@ W_COLLABORATION=$(whiptail --fb --title "Collaboration Settings" --radiolist "Co
   "High" "30+ Players" off \
   3>&1 1>&2 2>&3)
 if [ "$W_COLLABORATION" = "None" ]; then
-jq '.BackupFrequencyInHours = "NoCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.CollaborationPreset = "NoCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_COLLABORATION" = "Low" ]; then
-jq '.BackupFrequencyInHours = "LowCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.CollaborationPreset = "LowCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_COLLABORATION" = "Medium" ]; then
-jq '.BackupFrequencyInHours = "MediumCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.CollaborationPreset = "MediumCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_COLLABORATION" = "High" ]; then
-jq '.BackupFrequencyInHours = "HighCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+jq '.CollaborationPreset = "HighCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 }
 do_easy_config_backupskept() { #Backups Kept
@@ -179,7 +179,7 @@ if [ "$W_BACKUPS_KEPT" = "12" ]; then
 jq '.NumBackupsToKeep = "12"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPS_KEPT" = "Custom" ]; then	
-custom_backup_kept=$(whiptail --fb --title "Custom Backup Option" --inputbox "Custom Backup Choice:" 28 60 "20" 3>&1 1>&2 2>&3)	
+custom_backup_kept=$(whiptail --fb --title "Custom Backup Option" --inputbox "Custom Backup Choice:" 28 60 "15" 3>&1 1>&2 2>&3)	
 jq ".NumBackupsToKeep = \"${custom_backup_kept}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -203,7 +203,7 @@ if [ "$W_BACKUPFREQ" = "6 Hours" ]; then
 jq '.BackupFrequencyInHours = "6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPFREQ" = "Custom" ]; then	
-custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 28 60 "2.5" 3>&1 1>&2 2>&3)	
+custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 28 60 "5" 3>&1 1>&2 2>&3)	
 jq ".BackupFrequencyInHours = \"${custom_backup_freq}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
