@@ -132,6 +132,34 @@ CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco" #Modifies Save frequency from 60 to 300
 }
 #Functions used for easy config
+do_easy_config_backupskept() { #Backup Frequency
+echo "How many Backups to keep."
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Backup"
+W_BACKUPS_KEPT=$(whiptail --fb --title "How many Backups should you keep?" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+  "3" "Few Backups saved" off \
+  "5" "DEFAULT Backups" on \
+  "8" "More Backups" off \
+  "12" "Lots of Backups" off \
+  "Custom" "Custom ammount" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_BACKUPS_KEPT" = "3" ]; then
+jq '.NumBackupsToKeep = "3"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPS_KEPT" = "5" ]; then
+jq '.NumBackupsToKeep = "5"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPS_KEPT" = "8" ]; then
+jq '.NumBackupsToKeep = "8"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPS_KEPT" = "12" ]; then
+jq '.NumBackupsToKeep = "12"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPS_KEPT" = "Custom" ]; then	
+custom_backup_kept=$(whiptail --fb --title "Custom Backup Option" --inputbox "Custom Backup Choice:" 28 60 "20" 3>&1 1>&2 2>&3)	
+jq ".NumBackupsToKeep = \"${custom_backup_kept}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
+}
 do_easy_config_backupfreq() { #Backup Frequency
 echo "Choose a Backup Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
@@ -296,9 +324,10 @@ do_start_easy_config() {
             jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-	    do_easy_config_choose_wtcpumax #adding for testing
-	    do_easy_config_meteorchoices #adding for testing
-	    do_easy_config_backupfreq #adding for testing
+	    do_easy_config_choose_wtcpumax
+	    do_easy_config_meteorchoices
+	    do_easy_config_backupfreq
+	    do_easy_config_backupskept #adding for testing
             whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
           else
             echo "Port already taken"
