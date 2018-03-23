@@ -1,4 +1,4 @@
-adduser/addgroup Command
+adduser / addgroup Command
 The adduser and addgroup commands are used to add a user and group to the system respectively according to the default configuration specified in /etc/adduser.conf file.
 `sudo adduser eco`
 Begins the Add User process
