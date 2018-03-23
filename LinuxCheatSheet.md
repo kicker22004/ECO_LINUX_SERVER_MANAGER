@@ -1,69 +1,69 @@
 adduser/addgroup Command
 The adduser and addgroup commands are used to add a user and group to the system respectively according to the default configuration specified in /etc/adduser.conf file.
 
-' sudo adduser eco'
+'sudo adduser eco'
 Begins the Add User process
 
 agetty Command
 agetty is a program which manages physical or virtual terminals and is invoked by init. Once it detects a connection, it opens a tty port, asks for a user’s login name and calls up the /bin/login command. Agetty is a substitute of Linux getty:
 
-' agetty -L 9600 ttyS1 vt100'
+'agetty -L 9600 ttyS1 vt100'
 alias Command
 alias is a useful shell built-in command for creating aliases (shortcut) to a Linux command on a system. It is helpful for creating new/custom commands from existing Shell/Linux commands (including options):
 
-' alias home='cd /home/eco/public_html''
+'alias home='cd /home/eco/public_html''
 The above command will create an alias called home for /home/eco/public_html directory, so whenever you type home in the terminal prompt, it will put you in the /home/eco/public_html directory.
 
 apropos Command
 apropos command is used to search and display a short man page description of a command/program as follows.
 
-' apropos adduser'
+'apropos adduser'
 apt Command
 apt tool is a relatively new higher-level package manager for Debian/Ubuntu systems:
 
-' sudo apt update'
+'sudo apt update'
 For more apt usage read: 15 Useful Examples on APT Command
 
 apt-get Command
 apt-get is a powerful and free front-end package manager for Debian/Ubuntu systems. It is used to install new software packages, remove available software packages, upgrade existing software packages as well as upgrade entire operating system.
 
-' sudo apt-get update'
+'sudo apt-get update'
 For more apt-get usage, read: 25 Useful Commands of APT-GET for Package Management
 
 aptitude Command
 aptitude is a powerful text-based interface to the Debian GNU/Linux package management system. Like apt-get and apt; it can be used to install, remove or upgrade software packages on a system.
 
-' sudo aptitude update'
+'sudo aptitude update'
 For more usage on aptitude, read: Learn Debian Package Management with Aptitude Command
 
 arch Command
 arch is a simple command for displaying machine architecture or hardware name (similar to uname -m):
 
-' arch'
+'arch'
 arp Command
 ARP (Address Resolution Protocol) is a protocol that maps IP network addresses of a network neighbor with the hardware (MAC) addresses in an IPv4 network.
 
-' sudo arp-scan --interface=enp2s0 --localnet ' 
+'sudo arp-scan --interface=enp2s0 --localnet '
 at Command
 at command is used to schedule tasks to run in a future time. It’s an alternative to cron and anacron, however, it runs a task once at a given future time without editing any config files:
 
 For example, to shutdown the system at 23:55 today, run:
 
-' sudo echo "shutdown -h now" | at -m 23:55'
+'sudo echo "shutdown -h now" | at -m 23:55'
 atq Command
 atq command is used to view jobs in at command queue:
 
-' atq'
+'atq'
 atrm Command
 atrm command is used to remove/deletes jobs (identified by their job number) from at command queue:
 
-' atrm 2'
+'atrm 2'
 For more usage about at command, read: How to Use ‘at’ Command to Schedule a Task in Linux
 
 awk Command
 Awk is a powerful programming language created for text processing and generally used as a data extraction and reporting tool.
 
-' awk '//{print}'/etc/hosts'
+'awk '//{print}'/etc/hosts'
 For more Awk concepts (basic and advance) with simple and easy-to-understand, we’ve created a book that contains 13 chapters with a total of 41 pages, which covers all Awk basic and advance usage with practical examples: Awk Getting Started Guide for Beginners
 
 batch Command
@@ -72,11 +72,11 @@ batch is also used to schedule tasks to run a future time, similar to the at com
 'basename Command'
 basename command helps to print the name of a file stripping of directories in the absolute path:
 
-' basename bin/findhosts.sh'
+'basename bin/findhosts.sh'
 bc Command
 bc is a simple yet powerful and arbitrary precision CLI calculator language which can be used like this:
 
-' echo 20.05 + 15.00 | bc'
+'echo 20.05 + 15.00 | bc'
 bg Command
 bg is a command used to send a process to the background.
 
@@ -92,58 +92,58 @@ cat command is used to view contents of a file or concatenate files, or data pro
 chgrp Command
 chgrp command is used to change the group ownership of a file. Provide the new group name as its first argument and the name of file as the second argument like this:
 
-' chgrp eco users.txt'
+'chgrp eco users.txt'
 chmod Command
 chmod command is used to change/update file access permissions like this.
 
-' chmod +x sysinfo.sh'
+'chmod +x sysinfo.sh'
 chown Command
 chown command changes/updates the user and group ownership of a file/directory like this.
 
-' chmod -R www-data:www-data /var/www/html'
+'chmod -R www-data:www-data /var/www/html'
 To learn more about chgrp, chmod and chwon commands, read: Managing Users & Groups, File Permissions & Attributes in Linux
 
 cksum Command
 cksum command is used to display the CRC checksum and byte count of an input file.
 
-' cksum README.txt'
+'cksum README.txt'
 clear Command
 clear command lets you clear the terminal screen, simply type.
 
-' clear'
+'clear'
 cmp Command
 cmp performs a byte-by-byte comparison of two files like this.
 
-' cmp file1 file2'
+'cmp file1 file2'
 comm Command
 comm command is used to compare two sorted files line-by-line as shown below.
 
-' comm file1 file2'
+'comm file1 file2'
 cp Command
 cp command is used for copying files and directories from one location to another.
 
-' cp /home/eco/file1 /home/eco/Personal/'
+'cp /home/eco/file1 /home/eco/Personal/'
 For more information on how to copy files in Linux, read:
 
-' date'
-' date --set="8 JUN 2017 13:00:00"'
+'date'
+'date --set="8 JUN 2017 13:00:00"'
 To learn more about how to set date in Linux, read: How to Set System Date in Linux
 
 dir Command
 dir command works like Linux ls command, it lists the contents of a directory.
 
-' dir'
+'dir'
 dmidecode Command
 dmidecode command is a tool for retrieving hardware information of any Linux system. It dumps a computer’s DMI (a.k.a SMBIOS) table contents in a human-readable format for easy retrieval.
 
 To view your system hardware info, you can type:
 
-' sudo dmidecode --type system'
+'sudo dmidecode --type system'
 Some useful tools to find out Linux system hardware info: 10 Useful Commands to Get Linux Hardware Information
 
 du Command
 du command is used to show disk space usage of files present in a directory as well as its sub-directories as follows.
-' du /home/aaronkilik'
+'du /home/aaronkilik'
 
 echo Command
 echo command prints a text of line provided to it.
@@ -151,49 +151,49 @@ echo command prints a text of line provided to it.
 env Command
 env command lists all the current environment variables and used to set them as well.
 
-' env'
+'env'
 Learn more on How to Set and Unset Environment Variables in Linux
 
 exit Command
 exit command is used to exit a shell like so.
-' exit'
+'exit'
 
 expr Command
 expr command is used to calculate an expression as shown below.
-' expr 20 + 30'
+'expr 20 + 30'
 
 factor Command
 factor command is used to show the prime factors of a number.
 
-' factor 10'
+'factor 10'
 find Command
 find command lets you search for files in a directory as well as its sub-directories. It searches for files by attributes such as permissions, users, groups, file type, date, size and other possible criteria.
-' find /home/eco/ -name eco.txt'
+'find /home/eco/ -name eco.txt'
 
 free Command
 free command shows the system memory usage (free, used, swapped, cached, etc.) in the system including swap space. Use the -h option to display output in human friendly format.
 
-' free -h'
+'free -h'
 Learn more on how to find memory usage in Linux.
 
 Find Top Running Processes by Highest Memory and CPU Usage in Linux
-'Smem' – Reports Memory Consumption Per-Process and Per-User Basis in Linux
+'Smem'– Reports Memory Consumption Per-Process and Per-User Basis in Linux
 
 grep Command
 grep command searches for a specified pattern in a file (or files) and displays in output lines containing that pattern as follows.
 
-' grep ‘eco’ domain-list.txt'
+'grep ‘eco’ domain-list.txt'
 Learn more about grep command usage in Linux.
 
 groups Command
 groups command displays all the names of groups a user is a part of like this.
-' groups'
-' groups eco'
+'groups'
+'groups eco'
 
 gzip Command
 Gzip helps to compress a file, replaces it with one having a .gz extension as shown below:
-' gzip passwds.txt'
-' cat file1 file2 | gzip > foo.gz'
+'gzip passwds.txt'
+'cat file1 file2 | gzip > foo.gz'
 
 gunzip Command
 gunzip expands or restores files compressed with gzip command like this.
@@ -205,12 +205,12 @@ head command is used to show first lines (10 lines by default) of the specified 
 
 history Command
 history command is used to show previously used commands or to get info about command executed by a user.
-' history'
+'history'
 
 hostname Command
 hostname command is used to print or set system hostname in Linux.
-' hostname'
-' hostname NEW_HOSTNAME'
+'hostname'
+'hostname NEW_HOSTNAME'
 
 hostnamectl Command
 hostnamectl command controls the system hostname under systemd. It is used to print or modify the system hostname and any related settings:
@@ -441,7 +441,7 @@ reboot command may be used to halt, power-off or reboot a system as follows.
 rename Command
 rename command is used to rename many files at once. If you’ve a collection of files with “.html” extension and you want to rename all of them with “.php” extension, you can type the command below.
 
- rename 's/\.html/\.php/' *.html
+ rename 's/\.html/\.php/'*.html
 rm command
 rm command is used to remove files or directories as shown below.
 
