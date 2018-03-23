@@ -356,7 +356,7 @@ do_start_easy_config() {
 	    do_easy_config_backupfreq
             do_easy_config_backupskept #adding for testing
 	    do_easy_config_choose_wtcpumax
-            whiptail --fb --title "Server Config" --msgbox "Server option setup finished!" 10 60
+            whiptail --fb --title "Server Config" --msgbox "Server options setup finished!" 10 60
           else
             echo "Port already taken"
             echo "Var: \"${port1}\""
