@@ -33,7 +33,7 @@ do_upgrade() {
     do_run_app
 }
 do_upgrade_gui() {
-    if (whiptail --title "Update available !" --yesno "Found new update : \n Branch : ${DEFAULT_BRANCH} \n Local hash : ${LOCAL_SHA} \n Updated version : ${SERVER_SHA} \n Update ?" 10 60) then
+    if (whiptail --title "Update available !" --yesno "Found new update : \n Branch : ${DEFAULT_BRANCH} \n Local hash : ${LOCAL_SHA} \n Updated version : ${SERVER_SHA} \n Update ?" 15 80) then
 	    do_upgrade
     else
         do_run_app
@@ -45,7 +45,7 @@ do_check_updates() {
     echo ${GITHUB_ORGANIZATION_NAME}" / "${REPO_NAME}" / "${DEFAULT_BRANCH}
     LOCAL_SHA=$(<$GLOBAL_CONFIG/updater_data.cfg)
     echo -e ${yellow}"Version found online: "${green}"$SERVER_SHA"${NC}
-    echo -e ${yellow}"Currently Installed Version: "${green}"$ELSM_VERSION"${NC}
+    echo -e ${yellow}"Currently Installed Version: "${green}"$LOCAL_SHA"${NC}
     echo -e ${green}"Created and Maintained by: Kicker22004 and all the contributors <3"${NC}
     if [ $SERVER_SHA = $LOCAL_SHA ]; then
         do_run_app
