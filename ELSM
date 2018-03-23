@@ -139,8 +139,8 @@ SEL="Difficulty"
 W_COLLABORATION=$(whiptail --fb --title "Collaboration Settings" --radiolist "Collaboration Choices: (Spacebar to select!)" 23 60 10\
   "None" "1 - 6 Players" off \
   "Low" "6 - 10 Players" on \
-  "Medium" "10 - 30 Players" off \
-  "High" "30+ Players" off \
+  "Medium" "10 - 25 Players" off \
+  "High" "25+ Players" off \
   3>&1 1>&2 2>&3)
 if [ "$W_COLLABORATION" = "None" ]; then
 jq '.CollaborationPreset = "NoCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
@@ -179,7 +179,7 @@ if [ "$W_BACKUPS_KEPT" = "12" ]; then
 jq '.NumBackupsToKeep = "12"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPS_KEPT" = "Custom" ]; then	
-custom_backup_kept=$(whiptail --fb --title "Custom Backup Option" --inputbox "Custom Backup Choice:" 28 60 "15" 3>&1 1>&2 2>&3)	
+custom_backup_kept=$(whiptail --fb --title "Custom Backup Option" --inputbox "Custom Backup Choice:" 10 60 "15" 3>&1 1>&2 2>&3)	
 jq ".NumBackupsToKeep = \"${custom_backup_kept}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -203,7 +203,7 @@ if [ "$W_BACKUPFREQ" = "6 Hours" ]; then
 jq '.BackupFrequencyInHours = "6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_BACKUPFREQ" = "Custom" ]; then	
-custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 28 60 "5" 3>&1 1>&2 2>&3)	
+custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 10 60 "5" 3>&1 1>&2 2>&3)	
 jq ".BackupFrequencyInHours = \"${custom_backup_freq}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -235,7 +235,7 @@ if [ "$W_METEOR" = "Off" ]; then
 jq '.CreateMeteor = "false"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_METEOR" = "Custom" ]; then	
-custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 28 60 "44" 3>&1 1>&2 2>&3)	
+custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 10 60 "44" 3>&1 1>&2 2>&3)	
 jq ".MeteorImpactDays = \"${custom_meteor}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -259,7 +259,7 @@ if [ "$WT_CPUMAX" = "High Usage" ]; then
 jq '.WorldTickCPUMax = "0.58"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$WT_CPUMAX" = "Custom" ]; then	
-customcpu=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 28 60 "0.44" 3>&1 1>&2 2>&3)	
+customcpu=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 10 60 "0.44" 3>&1 1>&2 2>&3)	
 jq ".WorldTickCPUMax = \"${customcpu}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -267,7 +267,7 @@ do_easy_config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
   #Ask for server desc
-  ServerName=$(whiptail --fb --title "Server Name" --inputbox "Enter the server's description" 10 60 "Eco_LinuxServer" 3>&1 1>&2 2>&3)
+  ServerName=$(whiptail --fb --title "Server Name" --inputbox "Enter the server's description" 23 60 "Eco_LinuxServer" 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     jq ".Description = \"${ServerName}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
