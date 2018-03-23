@@ -187,7 +187,7 @@ do_easy_config_backupfreq() { #Backup Frequency
 echo "Choose a Backup Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Backup"
-W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+W_BACKUPFREQ=$(whiptail --fb --title "Backup Frequency Settings" --radiolist "Backup Frequency Choices: (Spacebar to select!)" 23 60 10\
   "2 Hours" "Backup Often" off \
   "4 Hours" "DEFAULT Backups" on \
   "6 Hours" "Delayed Backups" off \
@@ -243,7 +243,7 @@ do_easy_config_choose_wtcpumax() { #Choose CPU Usage Preset
 echo "Choose a utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
-WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+WT_CPUMAX=$(whiptail --fb --title "CPU Utilization Preset(s)" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
   "Low Usage" "Weak Servers" off \
   "Medium Usage(Default)" "Most Servers" on \
   "High Usage" "Powerful Servers" off \
