@@ -132,6 +132,30 @@ CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco" #Modifies Save frequency from 60 to 300
 }
 #Functions used for easy config
+do_easy_config_slots() { #Slots Settings
+echo "Choose Server Slots Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Users"
+W_SLOTS=$(whiptail --fb --title "Server Slots Settings" --radiolist "How many slots for Players: (Spacebar to select!)" 23 60 10\
+  "10 Slots" "Small Community" off \
+  "20 Slots" "Medium Community" off \
+  "Infinite Slots" "Default by Devs" on \
+  "Custom" "You Choose" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_SLOTS" = "10 Slots" ]; then
+jq '.MaxSlots = "10"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_SLOTS" = "20 Slots" ]; then
+jq '.MaxSlots = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_SLOTS" = "Infinite Slots" ]; then
+jq '.MaxSlots = "-1"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_SLOTS" = "Custom" ]; then	
+custom_slots=$(whiptail --fb --title "Custom Backup Option" --inputbox "Custom Slots Choice:" 10 60 "15" 3>&1 1>&2 2>&3)	
+jq ".MaxSlots = \"${custom_slots}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
+}
 do_easy_config_collaboration() { #Collaboration Settings
 echo "Choose Collaboration Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
