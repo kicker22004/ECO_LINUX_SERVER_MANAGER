@@ -372,7 +372,7 @@ do_start_easy_config() {
           if [[ ! -z port2 ]]; then
             #Set the Configs, guiding the user
             jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-            jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+            jq ".WebServerPort = \"${Wport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
 	    do_easy_config_collaboration #adding for Testing
