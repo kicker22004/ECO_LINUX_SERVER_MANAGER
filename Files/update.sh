@@ -33,7 +33,7 @@ do_upgrade() {
     do_run_app
 }
 do_upgrade_gui() {
-    if (whiptail --title "Update available !" --yesno "Found new update : \n Branch : ${DEFAULT_BRANCH} \n Local hash : ${LOCAL_SHA} \n Updated version : ${SERVER_SHA} \n  Message: ${UPDATE_MESSAGE}\nUpdate ?" 25 80) then
+    if (whiptail --fb --title "Update available !" --yesno "Found new update : \n Branch : ${DEFAULT_BRANCH} \n Local hash : ${LOCAL_SHA} \n Updated version : ${SERVER_SHA} \n  Message: ${UPDATE_MESSAGE}\nUpdate ?" 25 80) then
 	    do_upgrade
     else
         do_run_app
