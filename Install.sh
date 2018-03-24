@@ -1,4 +1,9 @@
 #!/bin/bash
+#Global colors
+green='\e[1;32m'
+red='\e[0;31m'
+yellow='\e[1;33m'
+NC='\033[0m'
 
 ## Eco Linux Server Manager Installer##
 INSTALL_LOC=/opt/ELSM
@@ -17,11 +22,14 @@ else
 	USER="$(whoami)"
 fi
 
+
 ########################################
 #######  Check for Dependencies  #######
 ########################################
 do_deps() {
 ##Debian mini fix (Missing lsb_release to detect version for mono)
+clear
+echo -e ${yellow}"Installing Dependencies...Please wait."$NC
 if hash apt-get 2>/dev/null; then
   apt-get -qq install lsb-release
   ##Detect OS
@@ -33,7 +41,7 @@ if hash apt-get 2>/dev/null; then
   echo "deb http://download.mono-project.com/repo/$DISTRO beta-$CODENAME main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
   apt-get -qq update
   apt-get -qq --allow-unauthenticated install mono-devel
-  echo -e "Deps installed !"
+  echo -e ${yellow}"Deps installed !"${NC}
 else
   yum -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano
   rpm --import "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF"
@@ -94,6 +102,7 @@ else
 	exit 0
 fi
 }
+
 do_config() {
   #Add the branch in config.
   BRANCH=$(git branch | grep \* | cut -d ' ' -f2-)
@@ -115,7 +124,7 @@ If you agree Please, continue." 15 60) then
 	mkdir $INSTALL_LOC/Backup
 	mkdir $INSTALL_LOC/Files
 	mkdir $INSTALL_LOC/Files/ELSM_LOGS
-  mkdir $INSTALL_LOC/Server
+  	mkdir $INSTALL_LOC/Server
 	touch $INSTALL_LOC/Files/ELSM_LOGS/ELSM.log
 	cp Files/* $INSTALL_LOC/Files
         echo XXX
@@ -136,12 +145,12 @@ If you agree Please, continue." 15 60) then
         echo XXX
         echo 80
         echo "Setting Permissions"
-        chown -R $SUDO_USER:$SUDO_USER $INSTALL_LOC
 	chmod +x /usr/bin/ELSM
 	chmod +x $INSTALL_LOC/Files/watch.sh
 	chmod +x $INSTALL_LOC/Files/update.sh
 	chmod +x $INSTALL_LOC/Files/update.sh
 	chmod +x $INSTALL_LOC/Files/upgrade
+	chown -R eco:eco /opt/ELSM
 	echo XXX
         sleep 2
         echo XXX
@@ -150,10 +159,14 @@ If you agree Please, continue." 15 60) then
         echo XXX
         sleep 2
 ) | whiptail --gauge "Gathering info" 8 40 0
-	whiptail --fb --msgbox "Ok everything is in order and you should now be able to run (ELSM) and start your server builds." 20 60
+	whiptail --fb --msgbox "Everything is installed, Please run (ELSM) under the eco user. Press Ok" 20 60
 	clear
-	echo "Ok everything is in order and you should now be able to run (ELSM) and start your server builds."
-exit 0
+	if [ ! "$SUDO_USER" = "eco" ]; then
+	echo -e ${yellow}"Please logout and login as the eco user!, Then run ${green} ELSM"${NC}
+	exit 0
+	else
+	echo -e ${yellow}"Your install has completed, Your already running on eco user so just run ${green}ELSM"${NC}
+	fi
 else
         exit 0
 fi
