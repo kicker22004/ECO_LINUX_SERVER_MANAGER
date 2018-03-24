@@ -33,7 +33,7 @@ do_upgrade() {
     do_run_app
 }
 do_upgrade_gui() {
-    if (whiptail --title "Update available !" --yesno "Found new update : \n Branch : ${DEFAULT_BRANCH} \n Local hash : ${LOCAL_SHA} \n Updated version : ${SERVER_SHA} \n Update ?" 15 80) then
+    if (whiptail --fb --title "Update available !" --yesno "Found new update : \n Branch : ${DEFAULT_BRANCH} \n Local hash : ${LOCAL_SHA} \n Updated version : ${SERVER_SHA} \n  Message: ${UPDATE_MESSAGE}\nUpdate ?" 25 80) then
 	    do_upgrade
     else
         do_run_app
@@ -42,6 +42,7 @@ do_upgrade_gui() {
 do_check_updates() {
     source $GLOBAL_CONFIG/conf.cfg
     SERVER_SHA=$(curl -s https://api.github.com/repos/"${GITHUB_ORGANIZATION_NAME}"/"${REPO_NAME}"/commits/"${DEFAULT_BRANCH}" | jq '.sha' | sed 's/"//g');
+    UPDATE_MESSAGE=$(curl -s https://api.github.com/repos/kicker22004/ECO_LINUX_SERVER_MANAGER/commits/Beta | jq '.commit.message' | sed 's/"//g' | sed 's/\\n\\n/ -> /g');
     echo ${GITHUB_ORGANIZATION_NAME}" / "${REPO_NAME}" / "${DEFAULT_BRANCH}
     LOCAL_SHA=$(<$GLOBAL_CONFIG/updater_data.cfg)
     echo -e ${yellow}"Version found online: "${green}"$SERVER_SHA"${NC}

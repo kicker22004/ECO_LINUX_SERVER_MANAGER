@@ -132,14 +132,90 @@ CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco" #Modifies Save frequency from 60 to 300
 }
 #Functions used for easy config
+do_easy_config_slots() { #Slots Settings
+echo "Choose Server Slots Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Users"
+W_SLOTS=$(whiptail --fb --title "Server Slots Settings" --radiolist "How many slots for Players: (Spacebar to select!)" 23 60 10\
+  "10 Slots" "Small Community" off \
+  "20 Slots" "Medium Community" off \
+  "Infinite Slots" "Default by Devs" on \
+  "Custom" "You Choose" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_SLOTS" = "10 Slots" ]; then
+jq '.MaxSlots = "10"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_SLOTS" = "20 Slots" ]; then
+jq '.MaxSlots = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_SLOTS" = "Infinite Slots" ]; then
+jq '.MaxSlots = "-1"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_SLOTS" = "Custom" ]; then	
+custom_slots=$(whiptail --fb --title "Custom Backup Option" --inputbox "Custom Slots Choice:" 10 60 "15" 3>&1 1>&2 2>&3)	
+jq ".MaxSlots = \"${custom_slots}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
+}
+do_easy_config_collaboration() { #Collaboration Settings
+echo "Choose Collaboration Preset"
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Difficulty"
+W_COLLABORATION=$(whiptail --fb --title "Collaboration Settings" --radiolist "Collaboration Choices: (Spacebar to select!)" 23 60 10\
+  "None" "1 - 6 Players" off \
+  "Low" "6 - 10 Players" on \
+  "Medium" "10 - 25 Players" off \
+  "High" "25+ Players" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_COLLABORATION" = "None" ]; then
+jq '.CollaborationPreset = "NoCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_COLLABORATION" = "Low" ]; then
+jq '.CollaborationPreset = "LowCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_COLLABORATION" = "Medium" ]; then
+jq '.CollaborationPreset = "MediumCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_COLLABORATION" = "High" ]; then
+jq '.CollaborationPreset = "HighCollaboration"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+}
+do_easy_config_backupskept() { #Backups Kept
+echo "How many Backups to keep."
+CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
+SEL="Backup"
+W_BACKUPS_KEPT=$(whiptail --fb --title "How many Backups should you keep?" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+  "5" "DEFAULT Backups" on \
+  "10" "More Backups" off \
+  "15" "Lots of Backups" off \
+  "20" "TONS of Backups" off \
+  "Custom" "Custom Backups saved" off \
+  3>&1 1>&2 2>&3)
+if [ "$W_BACKUPS_KEPT" = "5" ]; then
+jq '.NumBackupsToKeep = "5"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPS_KEPT" = "10" ]; then
+jq '.NumBackupsToKeep = "10"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPS_KEPT" = "15" ]; then
+jq '.NumBackupsToKeep = "15"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPS_KEPT" = "20" ]; then
+jq '.NumBackupsToKeep = "20"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
+if [ "$W_BACKUPS_KEPT" = "Custom" ]; then	
+custom_backup_kept=$(whiptail --fb --title "Custom Backup Option" --inputbox "Custom Backup Choice:" 10 60 "15" 3>&1 1>&2 2>&3)	
+jq ".NumBackupsToKeep = \"${custom_backup_kept}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
+fi
+}
 do_easy_config_backupfreq() { #Backup Frequency
 echo "Choose a Backup Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="Backup"
-W_BACKUPFREQ=$(whiptail --fb --title "Backup Settings" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+W_BACKUPFREQ=$(whiptail --fb --title "Backup Frequency Settings" --radiolist "Backup Frequency Choices: (Spacebar to select!)" 23 60 10\
   "2 Hours" "Backup Often" off \
   "4 Hours" "DEFAULT Backups" on \
   "6 Hours" "Delayed Backups" off \
+  "12 Hours" "Two Backups a day" off \
   "Custom" "Custom Delay" off \
   3>&1 1>&2 2>&3)
 if [ "$W_BACKUPFREQ" = "2 Hours" ]; then
@@ -151,8 +227,11 @@ fi
 if [ "$W_BACKUPFREQ" = "6 Hours" ]; then
 jq '.BackupFrequencyInHours = "6"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
+if [ "$W_BACKUPFREQ" = "12 Hours" ]; then
+jq '.BackupFrequencyInHours = "12"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+fi
 if [ "$W_BACKUPFREQ" = "Custom" ]; then	
-custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 28 60 "2.5" 3>&1 1>&2 2>&3)	
+custom_backup_freq=$(whiptail --fb --title "Custom Backup Frequency" --inputbox "Custom Backup Frequency:" 10 60 "5" 3>&1 1>&2 2>&3)	
 jq ".BackupFrequencyInHours = \"${custom_backup_freq}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -184,7 +263,7 @@ if [ "$W_METEOR" = "Off" ]; then
 jq '.CreateMeteor = "false"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$W_METEOR" = "Custom" ]; then	
-custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 28 60 "44" 3>&1 1>&2 2>&3)	
+custom_meteor=$(whiptail --fb --title "Custom Meteor Doomsday" --inputbox "Custom Meteor Doomday Length:" 10 60 "44" 3>&1 1>&2 2>&3)	
 jq ".MeteorImpactDays = \"${custom_meteor}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -192,7 +271,7 @@ do_easy_config_choose_wtcpumax() { #Choose CPU Usage Preset
 echo "Choose a utilization Preset"
 CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
 SEL="World"
-WT_CPUMAX=$(whiptail --fb --title "World Tick CPU Max" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
+WT_CPUMAX=$(whiptail --fb --title "CPU Utilization Preset(s)" --radiolist "Preset Choices: (Spacebar to select!)" 23 60 10\
   "Low Usage" "Weak Servers" off \
   "Medium Usage(Default)" "Most Servers" on \
   "High Usage" "Powerful Servers" off \
@@ -208,7 +287,7 @@ if [ "$WT_CPUMAX" = "High Usage" ]; then
 jq '.WorldTickCPUMax = "0.58"' $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
 fi
 if [ "$WT_CPUMAX" = "Custom" ]; then	
-customcpu=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 28 60 "0.44" 3>&1 1>&2 2>&3)	
+customcpu=$(whiptail --fb --title "CPU Max Custom Choice" --inputbox "Custom Max CPU Utilization:" 10 60 "0.44" 3>&1 1>&2 2>&3)	
 jq ".WorldTickCPUMax = \"${customcpu}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco	
 fi
 }
@@ -216,7 +295,7 @@ do_easy_config_serverDesc() {
   CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   SEL="Network"
   #Ask for server desc
-  ServerName=$(whiptail --fb --title "Server Name" --inputbox "Enter the server's description" 10 60 "Eco_LinuxServer" 3>&1 1>&2 2>&3)
+  ServerName=$(whiptail --fb --title "Server Name" --inputbox "Enter the server's description" 23 60 "Eco_LinuxServer" 3>&1 1>&2 2>&3)
   exitstatus=$?
   if [ $exitstatus = 0 ]; then
     jq ".Description = \"${ServerName}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
@@ -291,15 +370,18 @@ do_start_easy_config() {
        port2=$(netstat -an | grep $Wport | grep LISTEN)
         if [[ ! -z  port1 ]]; then
           if [[ ! -z port2 ]]; then
-            #Set the ports in config file
+            #Set the Configs, guiding the user
             jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
-            jq ".WebServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+            jq ".WebServerPort = \"${Wport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             do_easy_config_serverDesc
             do_easy_config_serverType
-	    do_easy_config_choose_wtcpumax #adding for testing
-	    do_easy_config_meteorchoices #adding for testing
-	    do_easy_config_backupfreq #adding for testing
-            whiptail --fb --title "Server Config" --msgbox "Server options finished !" 10 60
+	    do_easy_config_collaboration #adding for Testing
+            do_easy_config_meteorchoices
+	    do_easy_config_backupfreq
+            do_easy_config_backupskept #adding for testing
+	    do_easy_config_slots #adding for testing
+	    do_easy_config_choose_wtcpumax
+            whiptail --fb --title "Server Config" --msgbox "Server options setup finished!" 10 60
           else
             echo "Port already taken"
             echo "Var: \"${port1}\""

@@ -9,8 +9,8 @@ do_branch_choice() {
 "Choose your edition of ELSM" 15 60 4 \
 "master" "[Stable edition of ELSM, a few bugs]" ON \
 "Beta" "[For advanced users, lots of bugs !]" OFF 3>&1 1>&2 2>&3)
-
 }
+
 if [ $# = 1 ]; then
 	GIT_REPO_USER=$1
 else
@@ -59,7 +59,6 @@ git fetch
 git checkout $BRANCH
 chown -R eco:eco /tmp/elsm
 echo -e ${green}"ELSM successfully downloaded."${NC}
-
 echo -e ${yellow}"Start ELSM Installer..."${NC}
 chmod +xX ./Install.sh
 ./Install.sh $BRANCH
