@@ -14,7 +14,7 @@ case "$1" in
 esac
 do_run_app() {
     echo -e ${green}"You are up to date."
-    echo "Launching Program!"
+    echo -e "Launching Program!"$NC
     sleep 1
     exit 0
     /usr/bin/ELSM
