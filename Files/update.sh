@@ -17,19 +17,17 @@ do_run_app() {
     echo -e "Launching Program!"$NC
     sleep 1
     exit 0
-    /usr/bin/ELSM
+    /usr/bin/ELSM "${LOCK[@]}"
 }
 do_upgrade() {
     clear
     echo -e ${red}"An Updated Version was found, Grabbing files"
     sleep 2
     cd /opt/ELSM/Files/
+    echo "$SERVER_SHA" > updater_data.cfg
     wget -q https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/Files/upgrade -O upgrade
     chmod +x upgrade
     /opt/ELSM/Files/upgrade "${LOCK[@]}"
-
-    rm $GLOBAL_CONFIG/updater_data.cfg
-    echo "$SERVER_SHA" > $GLOBAL_CONFIG/updater_data.cfg
     do_run_app
 }
 do_upgrade_gui() {
