@@ -46,6 +46,10 @@ do_check_updates() {
     echo -e ${yellow}"Version found online: "${green}"$SERVER_SHA"${NC}
     echo -e ${yellow}"Currently Installed Version: "${green}"$LOCAL_SHA"${NC}
     echo -e ${green}"Created and Maintained by: Kicker22004 and all the contributors <3"${NC}
+    ##Getting Null responses if you run the update too often, this forces a crash on the updater.
+    if [ $SERVER_SHA = "null" ]; then
+        do_run_app
+    fi
     if [ $SERVER_SHA = $LOCAL_SHA ]; then
         do_run_app
     else
