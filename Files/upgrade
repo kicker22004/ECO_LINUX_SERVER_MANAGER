@@ -18,9 +18,9 @@ cd $INSTALL_LOC/Files/
 
 do_changelog() {
         cat <<EOF >> changelog
-1. Cleanup, More to come.
+1. More fixes to the Update scripts.
 EOF
-whiptail --fb --title "ELSM Changelog 0.2.2" --textbox changelog 20 60
+whiptail --fb --title "ELSM Changelog 0.2.3" --textbox changelog 20 60
 rm changelog
 }
 do_update() {
