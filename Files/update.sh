@@ -41,9 +41,9 @@ do_upgrade_gui() {
 }
 do_check_updates() {
     source $GLOBAL_CONFIG/conf.cfg
-    SERVER_SHA=$(curl -s https://api.github.com/repos/"${GITHUB_ORGANIZATION_NAME}"/"${REPO_NAME}"/commits/"${DEFAULT_BRANCH}" | jq '.sha' | sed 's/"//g');
+    SERVER_SHA=$(curl -s https://api.github.com/repos/"${GIT_REPO_USER}"/"${REPO_NAME}"/commits/"${DEFAULT_BRANCH}" | jq '.sha' | sed 's/"//g');
     UPDATE_MESSAGE=$(curl -s https://api.github.com/repos/kicker22004/ECO_LINUX_SERVER_MANAGER/commits/Beta | jq '.commit.message' | sed 's/"//g' | sed 's/\\n\\n/ -> /g');
-    echo ${GITHUB_ORGANIZATION_NAME}" / "${REPO_NAME}" / "${DEFAULT_BRANCH}
+    echo ${GIT_REPO_USER}" / "${REPO_NAME}" / "${DEFAULT_BRANCH}
     LOCAL_SHA=$(<$GLOBAL_CONFIG/updater_data.cfg)
     echo -e ${yellow}"Version found online: "${green}"$SERVER_SHA"${NC}
     echo -e ${yellow}"Currently Installed Version: "${green}"$LOCAL_SHA"${NC}
