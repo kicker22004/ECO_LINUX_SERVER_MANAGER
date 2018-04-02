@@ -58,6 +58,35 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
   fi
 }
 
+do_no_menu_restart() {
+source $DIR/$SELECTED_DIR/conf.cfg
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
+MONITOR="${SESSIONID}.${SELECTED_DIR}"
+if (screen -list | grep -o "${MONITOR}"); then
+	$WATCH_STOP
+	screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
+	do_monitoringloop
+else 
+	do_no_menu_start
+	echo "No Server running. Starting now!"
+fi
+}
+  
+do_monitoringloop(){
+source $DIR/$SELECTED_DIR/conf.cfg
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
+MONITOR="${SESSIONID}.${SELECTED_DIR}"
+
+if (screen -list | grep -o "${MONITOR}"); then
+	sleep 5s
+	echo "Server is still running. Pleas wait"
+	do_monitoringloop
+else 
+	echo "Server is down. Restarting now!"
+	do_no_menu_start
+fi
+}
+
 ##Time to include a restart command..
 do_restart() {
 if(whiptail --fb --title "Restart Eco Server?" --yes-button "Yes" --no-button "No"  --yesno "Would You like to restart Eco?" 10 60) then
@@ -1055,7 +1084,7 @@ case "$1" in
     exit 0
     ;;
  (restart)
-   do_restart
+   do_no_menu_restart
     exit 0
     ;;
   (*)
