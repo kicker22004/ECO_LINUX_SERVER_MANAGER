@@ -18,7 +18,7 @@ source $DIR/$SELECTED_DIR/conf.cfg
 if [ ! -f $DIR/$SELECTED_DIR/EcoServer.exe ]; then
 do_newserver
 else
-do_update
+#do_update
 ##We will now ask about ECO upgrades.
 do_ECO_upgrade_check
 fi
@@ -32,27 +32,21 @@ $INSTALL_LOC/Files/update.sh "${SELECTED_DIR[@]}"
 
 do_no_menu_start() {
 source $DIR/$SELECTED_DIR/conf.cfg
-SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
-MONITOR="${SESSIONID}.${SELECTED_DIR}"
-  if ! screen -list | grep -o "${MONITOR}"; then
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
+  if [ -z $SESSIONID ]; then
      cd $INSTALL_LOC/Files/
      $WATCH_START "${SELECTED_DIR[@]}"
   else
      echo "Server is already running... Please close it before running this."
   fi
-  if ! screen -list | grep -q "WATCH"; then
-     cd $INSTALL_LOC/Files/
-     $WATCH_START "${SELECTED_DIR[@]}"
-  fi
 }
 
 do_no_menu_stop() {
 source $DIR/$SELECTED_DIR/conf.cfg
-SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
-MONITOR="${SESSIONID}.${SELECTED_DIR}"
-  if screen -list | grep -o "${MONITOR}"; then
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
+  if screen -list | grep -o "${SESSIONID}"; then
     $WATCH_STOP
-    screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
+    screen -S $SESSIONID -p 0 -X stuff "exit $(printf \\r)"
   else
      echo "No server was found to be running... Did you start one?"
   fi
@@ -60,24 +54,21 @@ MONITOR="${SESSIONID}.${SELECTED_DIR}"
 
 do_no_menu_restart() {
 source $DIR/$SELECTED_DIR/conf.cfg
-SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
-MONITOR="${SESSIONID}.${SELECTED_DIR}"
-if (screen -list | grep -o "${MONITOR}"); then
-	$WATCH_STOP
-	screen -S $MONITOR -p 0 -X stuff "exit $(printf \\r)"
-	do_monitoringloop
-else 
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
+if [ -z $SESSIONID ]; then
 	do_no_menu_start
-	echo "No Server running. Starting now!"
+	clear
+        echo "No Server running. Starting now!"
+else
+	screen -S $SESSIONID -p 0 -X stuff "exit $(printf \\r)" 
 fi
 }
-  
+
 do_monitoringloop(){
 source $DIR/$SELECTED_DIR/conf.cfg
-SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
-MONITOR="${SESSIONID}.${SELECTED_DIR}"
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
 
-if (screen -list | grep -o "${MONITOR}"); then
+if (screen -list | grep -o "${SESSIONID}"); then
 	sleep 5s
 	echo "Server is still running. Pleas wait"
 	do_monitoringloop
@@ -516,17 +507,17 @@ do_stagethree() {
 ) | whiptail --gauge "Gathering info" 8 40 0
 ##Leave the script so we don't confuse users and attempt to start it after it's all ready up.
 INTERNAL_IP=$(hostname -I | awk '{print $1}')
-whiptail --msgbox --fb "Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:3001" 20 60 0
+whiptail --msgbox --fb "Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:$PORT" 20 60 0
 clear
-echo -e ${green}"Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:3001"
+echo -e ${green}"Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:$PORT"
 echo -e ${yellow}"To run the ECO_LINUX_SERVER_MANAGER interface just type ${red}ELSM${yellow} in your terminal"
 tput sgr0
 }
 
 do_start() {
-SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
-MONITOR="${SESSIONID}.${SELECTED_DIR}"
-  if ! screen -list | grep -o "${MONITOR}"; then
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
+echo "Your sessionid is: $SESSIONID"
+  if [ -z $SESSIONID ]; then
 	cd $INSTALL_LOC/Files/
 	$WATCH_START "${SELECTED_DIR[@]}"
     whiptail --fb --msgbox "Your Server is loading up please check the client after a bit of time..." 20 60 1
@@ -534,7 +525,7 @@ else
     whiptail --fb --msgbox "Found a server running please stop it first!" 20 60 1
     do_Qstop
 fi
-if ! screen -list | grep -o "${MONITOR}"; then
+if ! screen -list | grep -o "${SESSIONID}"; then
      cd $INSTALL_LOC/Files/
      $WATCH_START "${SELECTED_DIR[@]}"
 fi
@@ -542,9 +533,8 @@ fi
 
 
 do_stop() {
-SESSIONID=( $(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}') )
-MONITOR="${SESSIONID}.${SELECTED_DIR[0]}"
-  if ! screen -list | grep -o "${MONITOR}"; then
+SESSIONID=( $(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}') )
+  if ! screen -list | grep -o "${SESSIONID}"; then
     whiptail --fb --msgbox "There is no Server running right now, did you start it?" 20 60 1
 else
     do_Qstop
@@ -558,18 +548,17 @@ do_Qstop() {
   if [ $RET -eq 0 ]; then
     cd $DIR/$SELECTED_DIR
     $WATCH_STOP
-    screen -S ${MONITOR[0]} -p 0 -X stuff "exit $(printf \\r)"
+    screen -S ${SESSIONID} -p 0 -X stuff "exit $(printf \\r)"
     whiptail --fb --msgbox "Stopping Server.." 20 60 1
   fi
 }
 
 do_force_kill() {
-SESSIONID=( $(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}') )
-MONITOR="${SESSIONID}.${SELECTED_DIR[0]}"
+SESSIONID=( $(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}') )
 $WATCH_STOP
 $STOP
 sleep 3
-if ! screen -list | grep -o "${MONITOR}"; then
+if ! screen -list | grep -o "${SESSIONID}"; then
 whiptail --msgbox --fb "Your server has been killed, Returning to the main menu." 20 60 0
 do_menu
 fi
