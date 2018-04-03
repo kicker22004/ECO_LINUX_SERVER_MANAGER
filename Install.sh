@@ -35,12 +35,12 @@ if hash apt-get 2>/dev/null; then
   ##Detect OS
   DISTRO=$(lsb_release --id | awk '{print tolower($3)}')
   CODENAME=$(lsb_release --codename | awk '{print $2}')
-  apt-get -qq update
-  apt-get -qq install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano > /dev/null
+  apt-get -y update
+  apt-get -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano > /dev/null
   apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
   echo "deb http://download.mono-project.com/repo/$DISTRO beta-$CODENAME main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
-  apt-get -qq update
-  apt-get -qq --allow-unauthenticated install mono-devel
+  apt-get -y update
+  apt-get -y --allow-unauthenticated install mono-devel
   echo -e ${yellow}"Deps installed !"${NC}
 else
   yum -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano
@@ -54,6 +54,7 @@ do_arm() {
 if [[ "$CPUINFO" == arm* ]]; then
 ##If arm is detected notify them that it's unsafe to run this just yet##
 echo "Currently Arm isn't supported, I'll be looking into this soon."
+exit 1
 fi
 }
 
@@ -61,6 +62,7 @@ do_arm64() {
 if [[ "$CPUINFO" == aarch64 ]]; then
 ##If arm is detected notify them that it's unsafe to run this just yet##
 echo "Currently Arm 64-bit isn't supported, I'll be looking into this soon."
+exit 1
 fi
 }
 
