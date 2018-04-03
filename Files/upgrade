@@ -9,10 +9,6 @@ esac
 
 source $DIR/$SELECTED_DIR/conf.cfg
 CONFIG="${DIR}/${SELECTED_DIR}/conf.cfg"
-echo "This is the selected files: $SELECTED_DIR"
-###############################
-###      Version 0.2.4     ###
-###############################
 
 cd $INSTALL_LOC/Files/
 }
