@@ -9,19 +9,8 @@ esac
 
 source $DIR/$SELECTED_DIR/conf.cfg
 CONFIG="${DIR}/${SELECTED_DIR}/conf.cfg"
-echo "This is the selected files: $SELECTED_DIR"
-###############################
-###      Version 0.2.3     ###
-###############################
 
 cd $INSTALL_LOC/Files/
-
-do_changelog() {
-        cat <<EOF >> changelog
-1. More fixes to the Update scripts.
-EOF
-whiptail --fb --title "ELSM Changelog 0.2.3" --textbox changelog 20 60
-rm changelog
 }
 do_update() {
 	cp $CONFIG $DIR/$SELECTED_DIR/conf.cfg.bak
@@ -50,7 +39,6 @@ do_update() {
 }
 
 if [ -f $DIR/$SELECTED_DIR/conf.cfg ]; then
-	do_changelog
 	do_update
 else
 	whiptail --msgbox --fb "Sorry it seems that your ELSM installation is not complete. Leaving." 20 60 0
