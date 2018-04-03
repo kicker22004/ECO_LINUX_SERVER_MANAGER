@@ -31,8 +31,7 @@ echo "==============================================================
 cd $DIR/$SELECTED_DIR/
 $START
 sleep 2
-SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
-MONITOR="${SESSIONID}.${SELECTED_DIR}"
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
 do_restart() {
 ###Make a new logfile for the start.###
 echo $(date) >> $LOG_FILE
@@ -43,8 +42,7 @@ Failure counter is at: $COUNTER out of 3
     cd $DIR/$SELECTED_DIR
     $START
     sleep 1
-    SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print strtonum($1)}')
-    MONITOR="${SESSIONID}.${SELECTED_DIR}"
+    SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
     let COUNTER=COUNTER+1
     sleep 1m
 }
@@ -53,7 +51,7 @@ Failure counter is at: $COUNTER out of 3
 COUNTER=0
 while true; do
 sleep 5s
-   if screen -list | grep -o "${MONITOR}"; then
+   if screen -list | grep -o "${SESSIONID}"; then
     COUNTER=0
 else
     #We have spotted a crash of some form so let's restart the server and give it extra time.
