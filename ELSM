@@ -393,6 +393,7 @@ do_start_easy_config() {
             #Set the Configs, guiding the user
             jq ".GameServerPort = \"${Gport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
             jq ".WebServerPort = \"${Wport}\"" $CONFIGS/$SEL.eco|sponge $CONFIGS/$SEL.eco
+	    sed -i 's/PORT=.*/PORT='${Gport}'/g' $INSTALL_LOC/Server/$SELECTED_DIR/conf.cfg
             do_easy_config_serverDesc
             do_easy_config_serverType
 	    do_easy_config_collaboration #adding for Testing
@@ -507,9 +508,9 @@ do_stagethree() {
 ) | whiptail --gauge "Gathering info" 8 40 0
 ##Leave the script so we don't confuse users and attempt to start it after it's all ready up.
 INTERNAL_IP=$(hostname -I | awk '{print $1}')
-whiptail --msgbox --fb "Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:$PORT" 20 60 0
+whiptail --msgbox --fb "Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:$Wport" 20 60 0
 clear
-echo -e ${green}"Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:$PORT"
+echo -e ${green}"Ok your server should be live for you to play now. Also don't forget to check out the WebUI at: $INTERNAL_IP:$Wport"
 echo -e ${yellow}"To run the ECO_LINUX_SERVER_MANAGER interface just type ${red}ELSM${yellow} in your terminal"
 tput sgr0
 }
