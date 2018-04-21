@@ -28,11 +28,12 @@ do_upgrade() {
     wget -q https://raw.githubusercontent.com/$GIT_REPO_USER/ECO_LINUX_SERVER_MANAGER/$DEFAULT_BRANCH/Files/upgrade -O upgrade
     chmod +x upgrade
     /opt/ELSM/Files/upgrade "${LOCK[@]}"
-    do_run_app
+    clear
+    echo "Your ELSM install has been updated, Please run again."
 }
 do_upgrade_gui() {
     if (whiptail --fb --title "Update available !" --yesno "Found new update : \n Branch : ${DEFAULT_BRANCH} \n Local hash : ${LOCAL_SHA} \n Updated version : ${SERVER_SHA} \n  Message: ${UPDATE_MESSAGE}\nUpdate ?" 25 80) then
-	    do_upgrade
+	do_upgrade
     else
         do_run_app
     fi
