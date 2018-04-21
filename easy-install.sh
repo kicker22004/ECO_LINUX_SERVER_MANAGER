@@ -30,9 +30,9 @@ fi
 #Install deps
 echo -e ${yellow}"Installing git..."${NC}
 if hash apt-get 2>/dev/null; then
-    apt-get -y install git whois > /dev/null
+    apt-get -y install git whois whiptail > /dev/null
 elif hash yun 2>/dev/null; then
-    yun -y  install git whois > /dev/null
+    yun -y  install git whois whiptail > /dev/null
 fi
 echo -e ${green}"Git successfully installed."${NC}
 
