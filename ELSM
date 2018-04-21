@@ -19,8 +19,6 @@ if [ ! -f $DIR/$SELECTED_DIR/EcoServer.exe ]; then
 do_newserver
 else
 do_update
-##We will now ask about ECO upgrades.
-do_ECO_upgrade_check
 fi
 }
 
@@ -835,19 +833,6 @@ RET=$?
     exit 1
   fi
 done
-}
-
-do_ECO_upgrade_check() {
-cd $INSTALL_LOC/Files
-wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt
-UPGRADE_VERSIONS=$(cat server_version.txt | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
-UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' server_version.txt | sort -r | awk '{print $1 " |"}')
-
-if [ ! $UPGRADE_VERSIONS = "1" ]; then
-	if (whiptail --fb --title "ECO Upgrade Notice!" --yesno "There were ECO upgrades found!, Would you like to update now?" 10 78) then
-    		do_upgrade
-	fi
-fi
 }
 
 do_thankyou() {
