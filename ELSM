@@ -42,7 +42,7 @@ SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
 do_no_menu_stop() {
 source $DIR/$SELECTED_DIR/conf.cfg
 SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
-  if screen -list | grep -o "${SESSIONID}"; then
+  if [ ! -z $SESSIONID ]; then
     $WATCH_STOP
     screen -S $SESSIONID -p 0 -X stuff "exit $(printf \\r)"
   else
@@ -594,112 +594,118 @@ do_stagetwo
 }
 
 do_upgrade() {
-whiptail --msgbox --fb --title "404" "This menu is going to be disabled for now, It's a bit to rushed and I would like to fine tune it more. Sorry guys i'll get to it soon." 20 60 0
+source $DIR/$SELECTED_DIR/conf.cfg
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
+do_no_menu_stop
+cd $INSTALL_LOC/Files
+wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt 
+UPGRADE_VERSIONS=$(cat server_version.txt | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
+UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' server_version.txt | sort -r | awk '{print $1 " |"}')
+cd $INSTALL_LOC
+if [ $UPGRADE_VERSIONS = "1" ]; then
+        whiptail --fb --msgbox --title "Latest Version found!" "You're currently running the latest ECO Beta, Check back later" 10 70 0
+do_menu
+else
+SELECTED_VERSION=$(whiptail --menu --fb "Select Your ECO server." 20 60 10 ${UPGRADE_LIST[@]} 3>&1 1>&2 2>&3)
+RET=$?
+if [ $RET -eq 1 ]; then
+do_menu
+elif [ $RET -eq 0 ]; then
+if [ ! -z $SESSIONID ]; then
+while true; do
+if screen -list | grep -o "${SESSIONID}"; then
+screen -S $SESSIONID -p 0 -X stuff "exit $(printf \\r)"
+sleep 3
+else
+break
+fi
+done
+else
+clear
+echo -e ${yellow}"Checking for upgrades.."
+tput sgr0
+sleep 2
+fi
+rm -rf $INSTALL_LOC/Backup/*
+clear
+echo -e ${yellow} "Making a backup!"
+tput sgr0
+cd $INSTALL_LOC/Archives
+VERSION="$ECO_VERSION"
+echo $VERSION | cut -d "-" -f1
+tar -zcvf ${SELECTED_DIR}_$VERSION.tar.gz -C $DIR/$SELECTED_DIR .
+tar -xf ${SELECTED_DIR}_$VERSION.tar.gz -C $INSTALL_LOC/Backup/
+rm -rf $DIR/$SELECTED_DIR/*
+fi
+cd $INSTALL_LOC
+dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION")
+
+r=$(wget $dl_link -O $DIR/$SELECTED_DIR/$SELECTED_VERSION)
+if [ $? -ne 0 ]; then
+whiptail --msgbox --clear --fb "Download failed!, check your internet and the link.\
+The current link is: $dl_link" 20 60
+fi
+fi
+cd $DIR/$SELECTED_DIR
+#Grab avalible download versions from site (Linux Server only)
+unzip $SELECTED_VERSION
+rm $SELECTED_VERSION
+if [ ! -d $DIR/$SELECTED_DIR/Storage ]; then
+        mkdir $DIR/$SELECTED_DIR/Storage
+fi
+cp $INSTALL_LOC/Backup/conf.cfg $DIR/$SELECTED_DIR/
+sed -i 's/ECO_VERSION=.*/ECO_VERSION='$SELECTED_VERSION'/g' $DIR/$SELECTED_DIR/conf.cfg
+cp -R $INSTALL_LOC/Backup/Storage/* $DIR/$SELECTED_DIR/Storage/
+
+# Grabing saved configs.
+VAR=( $(ls $DIR/$SELECTED_DIR/Configs/) )
+x=0
+while [ $x -le "${#VAR[@]}" ]
+do
+SELECTED="${VAR[$x]}"
+x=$(( $x + 1 ))
+if [ $x = "${#VAR[@]}" ]; then
+break
+else
+jq -s 'add' $DIR/$SELECTED_DIR/Configs/$SELECTED $INSTALL_LOC/Backup/Configs/$SELECTED | sponge $DIR/$SELECTED_DIR/Configs/$SELECTED
+fi
+done
+whiptail --fb --msgbox --title "Completed" "Your server is now running version: $SELECTED_VERSION" 10 60 0
+do_no_menu_start
 }
-#if screen -list | grep -q "ECO"; then
-#    cd $DIR/$SELECTED_DIR
-#    $WATCH_STOP
-#    $STOP
-#fi
-
-#cd $INSTALL_LOC/Files
-#wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt 
-#UPGRADE_VERSIONS=$(cat server_version.txt | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
-#UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' server_version.txt | sort -r | awk '{print $1 " |"}')
-#echo "This is your Upgrade_list: $UPGRADE_LIST"
-
-#if [ $UPGRADE_VERSIONS = "1" ]; then
-#        whiptail --fb --msgbox --title "Latest Version found!" "You're currently running the latest ECO Beta, Check back later" 10 70 0
-#do_menu
-#else
-#rm -rf $INSTALL_LOC/Backup/*
-#rm $INSTALL_LOC/Archives/UPGRADE_ROLLBACK.tar.gz
-#cd $INSTALL_LOC/Archives
-#cp $INSTALL_LOC/Files/conf.cfg $SELECTED_DIR/
-#tar -zcvf UPGRADE_ROLLBACK.tar.gz -C $SELECTED_DIR .
-#tar -xf UPGRADE_ROLLBACK.tar.gz -C $INSTALL_LOC/Backup/
-#rm -rf $SELECTED_DIR/*
-#cd $INSTALL_LOC
-#SELECTED_VERSION=$(whiptail --menu --fb "Select Your ECO server." 20 60 10 ${UPGRADE_LIST[@]} 3>&1 1>&2 2>&3)
-#RET=$?
-#if [ $RET -eq 1 ]; then
-##Falling back
-#cd $INSTALL_LOC/Archives/
-#tar -xf UPGRADE_ROLLBACK.tar.gz -C $SELECTED_DIR
-#whiptail --fb --msgbox --title "Emergency Recovery" "Your server was restored because you canceled" 10 60 0
-#do_menu
-#elif [ $RET -eq 0 ]; then
-#dl_link=$(echo "https://s3-us-west-2.amazonaws.com/eco-releases/$SELECTED_VERSION")
-#fi
-#
-#r=$(wget $dl_link -O $SELECTED_DIR/$SELECTED_VERSION)
-#if [ $? -ne 0 ]; then
-#whiptail --msgbox --clear --fb "Download failed!, check your internet and the link.\
-#The current link is: $dl_link" 20 60
-#fi
-#fi
-#cd $SELECTED_DIR
-##Grab avalible download versions from site (Linux Server only)
-#unzip $SELECTED_VERSION
-#rm $SELECTED_VERSION
-#if [ ! -d $SELECTED_DIR/Storage ]; then
-#        mkdir $SELECTED_DIR/Storage
-#fi
-#sed -i 's/ECO_VERSION=.*/ECO_VERSION='$SELECTED_VERSION'/g' $INSTALL_LOC/Files/conf.cfg
-#cp -R $INSTALL_LOC/Backup/Storage/* $SELECTED_DIR/Storage/
-#cp $INSTALL_LOC/Backup/conf.cfg $DIR/$SELECTED_DIR/
-
-
-## Grabing saved configs.
-#VAR=( $(ls $SELECTED_DIR/Configs/) )
-#x=0
-#while [ $x -le "${#VAR[@]}" ]
-#do
-#SELECTED="${VAR[$x]}"
-#x=$(( $x + 1 ))
-#if [ $x = "${#VAR[@]}" ]; then
-#break
-#else
-#jq -s 'add' $SELECTED_DIR/Configs/$SELECTED $INSTALL_LOC/Backup/Configs/$SELECTED | sponge $SELECTED_DIR/Configs/$SELECTED
-#fi
-#done
-#whiptail --fb --msgbox --title "Completed" "Your server is now running version: $SELECTED_VERSION" 10 60 0
-#cd $DIR/$SELECTED_DIR
-#$WATCH_START
-#source /opt/ELSM/Files/conf.cfg
-#do_menu
-#}
 
 do_restore() {
+source $DIR/$SELECTED_DIR/conf.cfg
+SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
 whiptail --fb --yesno "THIS IS ONLY IF YOUR UPGRADE FAILED... NOT THE SAME AS ROLLBACK!" 10 60 \
     --yes-button Yes --no-button No
   RET=$?
   if [ $RET -eq 0 ]; then
+
+##Later we will look at backup names to show only the working server, But out of time tonight.
+list=$(ls $INSTALL_LOC/Archives/ | sort -n | awk '{print $n " |"}')
+RESTORE=$(whiptail --menu --fb "Please select your backup." 20 60 10 ${list[@]} 3>&1 1>&2 2>&3)
+RET=$?
+if [ $RET -eq 1 ]; then
+exit 1
+elif [ $RET -eq 0 ]; then
+do_no_menu_stop
+if [ ! -z $SESSIONID ]; then
+while true; do
+if screen -list | grep -o "${SESSIONID}"; then
+screen -S $SESSIONID -p 0 -X stuff "exit $(printf \\r)"
+sleep 3
+else
+break
+fi
+done
+fi
 rm -rf $SELECTED_DIR/*
 cd $INSTALL_LOC/Archives/
-tar -xf UPGRADE_ROLLBACK.tar.gz -C $SELECTED_DIR
-mv $SELECTED_DIR/conf.cfg /$INSTALL_LOC/Files/
-whiptail --fb --msgbox --title "Emergency Recovery" "Your server was restored to your last backup!" 10 60 0
+tar -xf $RESTORE -C $DIR/$SELECTED_DIR
+whiptail --msgbox --fb "Your server has been restored, Please attempt to run it." 15 60
 do_menu
 fi
-}
-
-do_rollback() {
-ROLLBACK=$(ls $SELECTED_DIR/Storage/Backup/ | awk '{print $1 " |"}')
-
-if [ ! $ROLLBACK ]; then
-	whiptail --msgbox --fb --title "NOTHING FOUND!" "You have no backups to fallback to." 10 60
-else
-	whiptail --msgbox --fb --title "Stopping ECO server" "This requires the server to be stopped, Stopping now." 10 60 0
-	cd $DIR/$SELECTED_DIR
-	$WATCH_STOP
-        $STOP
-	SELECTED_BACKUP=$(whiptail --menu --fb "Select Your ECO backup." 20 60 10 ${ROLLBACK[@]} 3>&1 1>&2 2>&3)
-	RET=$?
-	if [ $RET -eq 0 ]; then
-		cd $SELECTED_DIR/Storage/Backup/
-		cp $SELECTED_BACKUP ../Game.eco
-	fi
 fi
 }
 
@@ -816,8 +822,7 @@ do_upgrade_menu() {
 while true; do
   FUN=$(whiptail --fb --title "Main Menu (${SELECTED_DIR}), Build: $ELSM_VERSION" --menu "Server Controls"  --cancel-button Exit --ok-button Select 20 80 8 \
     "1 Upgrade" "[Upgrade ECO]" \
-    "2 Rollback" "[Rollback from ECO backups]" \
-    "3 Restore" "[Fallback to working server prior to upgrade attempt.]" \
+    "2 Restore" "[Fallback to working server prior to upgrade attempt.]" \
   3>&1 1>&2 2>&3)
 RET=$?
   if [ $RET -eq 1 ]; then
@@ -825,8 +830,7 @@ RET=$?
   elif [ $RET -eq 0 ]; then
     case "$FUN" in
       1\ *) do_upgrade ;;
-      2\ *) do_rollback ;;
-      3\ *) do_restore ;;
+      2\ *) do_restore ;;
  *) whiptail --msgbox "Programmer error: unrecognized option" 20 60 1 ;;
     esac || whiptail --msgbox "There was an error running option $FUN" 20 60 1
   else
@@ -959,7 +963,7 @@ RET=$?
       3\ *) do_restart ;;
       4\ *) do_config_choice_menu ;;
       5\ *) do_multi_check ;;
-      6\ *) do_upgrade ;;
+      6\ *) do_upgrade_menu ;;
       7\ *) do_reset_menu ;;
       8\ *) do_newserver ;;
       9\ *) do_advanced_menu ;;
