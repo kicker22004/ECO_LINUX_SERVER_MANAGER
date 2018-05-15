@@ -7,6 +7,17 @@ SELECTED_DIR=$2
 DIR="/opt/ELSM/Server"
 
 
+##Checking to see if this user can even use ELSM... Many issues because of permissions.
+FILE="/opt/ELSM"
+if [ ! -w "$FILE" ]; then
+OWNER=$(stat -c "%U" /opt/ELSM)
+	clear
+	whiptail --fb --title "PERMISSIONS NOT FOUND" --msgbox "You don't have write permissions to ELSM, Check /opt/ELSM and make sure your user can read/write. \n
+ The folder is owned by:${OWNER} \n
+ And you are attempting to run it as User:$USER" 20 60
+	exit 1
+fi
+
 do_startup() {
 ##Simple check to make sure there is actually a server built##
 ##############################################################
@@ -26,6 +37,7 @@ fi
 
 do_update() {
 $INSTALL_LOC/Files/update.sh "${SELECTED_DIR[@]}"
+do_ECO_upgrade_check
 }
 
 do_no_menu_start() {
@@ -557,9 +569,8 @@ INSTALL_LOC="/opt/ELSM"
 DIR="${INSTALL_LOC}/Server"
 ###Grab a list and see what we can do with it##
 cd $INSTALL_LOC/Files
-GETLIST=$(wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt)
-GETLIST="${INSTALL_LOC}/Files/server_version.txt"
-eco_server_list=$(cat server_version.txt | sort -r | awk '{print $1 " |"}')
+GETLIST=$(wget -q "https://s3-us-west-2.amazonaws.com/eco-releases?list-type=2&continuation-token=1zoOgq7JomxXD9m5NwIKbcoZefLPFN8VBZbKUOQKj1gGQFjDxq7HTk8WlaYY8bxAzNI7sp2Z15plsq7fVWcO35IzFCevVNbb3" -O list.xml)
+eco_server_list=$(cat list.xml | grep -o "EcoServer_........-beta.zip" | sort -r | awk '{print $1 " |"}')
 
 SELECTED_VERSION=$(whiptail --menu --fb "Select Your ECO server." 20 60 10 ${eco_server_list[@]} 3>&1 1>&2 2>&3)
 RET=$?
@@ -598,9 +609,10 @@ source $DIR/$SELECTED_DIR/conf.cfg
 SESSIONID=$(screen -ls | awk '/\.'${SELECTED_DIR}'\t/ {print $1}')
 do_no_menu_stop
 cd $INSTALL_LOC/Files
-wget -q https://raw.githubusercontent.com/kicker22004/ECO_Linux_Server_Manager/master/Files/server_version.txt -O server_version.txt 
-UPGRADE_VERSIONS=$(cat server_version.txt | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
-UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' server_version.txt | sort -r | awk '{print $1 " |"}')
+GETLIST=$(wget -q "https://s3-us-west-2.amazonaws.com/eco-releases?list-type=2&continuation-token=1zoOgq7JomxXD9m5NwIKbcoZefLPFN8VBZbKUOQKj1gGQFjDxq7HTk8WlaYY8bxAzNI7sp2Z15plsq7fVWcO35IzFCevVNbb3" -O list.xml)
+eco_server_list=$(cat list.xml | grep -o "EcoServer_........-beta.zip" | sort -r > list)
+UPGRADE_VERSIONS=$(cat list | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
+UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' list | sort -r | awk '{print $1 " |"}')
 cd $INSTALL_LOC
 if [ $UPGRADE_VERSIONS = "1" ]; then
         whiptail --fb --msgbox --title "Latest Version found!" "You're currently running the latest ECO Beta, Check back later" 10 70 0
@@ -934,6 +946,17 @@ do_config_choice_menu() {
   else
     exit 1
   fi
+}
+
+do_ECO_upgrade_check() {
+cd $INSTALL_LOC/Files
+GETLIST=$(wget -q "https://s3-us-west-2.amazonaws.com/eco-releases?list-type=2&continuation-token=1zoOgq7JomxXD9m5NwIKbcoZefLPFN8VBZbKUOQKj1gGQFjDxq7HTk8WlaYY8bxAzNI7sp2Z15plsq7fVWcO35IzFCevVNbb3" -O list.xml)
+eco_server_list=$(cat list.xml | grep -o "EcoServer_........-beta.zip" | sort -r > list)
+UPGRADE_VERSIONS=$(cat list | sort -r | grep -n $ECO_VERSION | cut -d ":" -f1)
+UPGRADE_LIST=$(sed ''$UPGRADE_VERSIONS',$d' list | sort -r | awk '{print $1 " |"}')
+if [ ! $UPGRADE_VERSIONS = "1" ]; then
+	whiptail --fb --title "ECO Upgrade Notice!" --msgbox "An upgrade to eco was detected..." 10 78
+fi
 }
 
 do_menu() {
