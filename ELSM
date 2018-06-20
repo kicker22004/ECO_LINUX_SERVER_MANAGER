@@ -143,8 +143,9 @@ CONFIGS="${DIR}/${SELECTED_DIR}/Configs"
   #Optimize Function
   #Still important to add WorldTickCPUMax to the World.eco file prior to setting the option for the user
   echo "Optimizing Server..."
-  sed -i '5s/^/ },\n/' "$CONFIGS/World.eco" #Add neccesary }, to the file
-  sed -i '6s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/World.eco" #Add WorldTickCPUMax Option and new line the bracket
+  sed -i "4 d" "$CONFIGS/World.eco"  
+  sed -i '4s/^/ },\n/' "$CONFIGS/World.eco" #Add neccesary }, to the file
+  sed -i '5s/^/ "WorldTickCPUMax": 0.44\n/' "$CONFIGS/World.eco" #Add WorldTickCPUMax Option and new line the bracket
   sed -i 's/60/300/g' "$CONFIGS/Storage.eco" #Modifies Save frequency from 60 to 300
 }
 #Functions used for easy config
