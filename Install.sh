@@ -38,7 +38,7 @@ if hash apt-get 2>/dev/null; then
   apt-get -y update
   apt-get -y install screen git wget rsync unzip sysstat inotify-tools bc jq curl moreutils sudo dirmngr ca-certificates lsof nano > /dev/null
   apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-  echo "deb http://download.mono-project.com/repo/$DISTRO beta-$CODENAME main" | sudo tee /etc/apt/sources.list.d/mono-official-beta.list
+  echo "deb http://download.mono-project.com/repo/$DISTRO beta-$CODENAME main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
   apt-get -y update
   apt-get -y --allow-unauthenticated install mono-devel
   echo -e ${yellow}"Deps installed !"${NC}
